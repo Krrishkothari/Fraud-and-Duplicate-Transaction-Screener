@@ -1,0 +1,267 @@
+/* Button */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button-primary {
+  background: var(--accent);
+  color: var(--white);
+}
+
+.button-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.button-secondary {
+  background: var(--white);
+  border-color: var(--gray-300);
+  color: var(--gray-900);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: var(--gray-100);
+}
+
+.button-ghost {
+  background: transparent;
+  color: var(--gray-700);
+}
+
+.button-ghost:hover:not(:disabled) {
+  background: var(--gray-100);
+}
+
+/* Card */
+.card {
+  padding: var(--space-5);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+/* Table: scrolls inside its wrapper, so the header can stay in view */
+.table-wrap {
+  max-height: 32rem;
+  overflow: auto;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--gray-200);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  background: var(--gray-100);
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table .num {
+  text-align: right;
+}
+
+.table td.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+}
+
+.badge-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.badge-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.badge-info {
+  background: var(--info-soft);
+  color: var(--info);
+}
+
+.badge-neutral {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+/* Field */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field-label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.field-hint {
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--white);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  color: var(--gray-900);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+
+.field [aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+/* Alert */
+.alert {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+}
+
+.alert-icon {
+  flex: none;
+  margin-top: 2px;
+}
+
+.alert-title {
+  font-weight: 600;
+}
+
+.alert-body {
+  color: var(--gray-900);
+}
+
+.alert-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.alert-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.alert-success {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.alert-info {
+  background: var(--info-soft);
+  color: var(--info);
+}
+
+/* Spinner */
+.spinner {
+  display: inline-flex;
+  color: var(--accent);
+}
+
+.spinner svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner svg {
+    animation-duration: 4s;
+  }
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-7) var(--space-4);
+  text-align: center;
+}
+
+.empty-state-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.empty-state-body {
+  max-width: 40ch;
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+}
+
+.empty-state-action {
+  margin-top: var(--space-2);
+}
