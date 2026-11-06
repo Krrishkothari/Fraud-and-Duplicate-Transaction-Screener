@@ -1,0 +1,28 @@
+# Java and Maven
+target/
+
+# Node
+node_modules/
+dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE folders
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+*.iml
+
+# Logs
+*.log
+
+# Generated data
+data/generated/
+
+# macOS
+.DS_Store
