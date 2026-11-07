@@ -1,0 +1,30 @@
+- Project: TxnScreen, a fraud and duplicate transaction screener for fraud
+analysts.
+- Monorepo: backend/ (Java 21, Spring Boot, Maven, package com.txnscreen),
+frontend/ (React + Vite + TypeScript), data/, docs/.
+- Faculty rules: all assessed algorithms are our own Java code in
+com.txnscreen.algo. Never use a library Bloom filter, segment tree,
+percentile or selection routine. Java Collections only as support.
+The frontend never computes algorithm results; it only calls the API.
+- Bloom filter hits mean "possibly present" and must be confirmed against
+an exact store before a flag is raised.
+- Money is long paise. Timestamps are ISO-8601 with offset, stored as
+epoch seconds. CSV header:
+Fraud and Duplicate Transaction Screener: Build Plan
+
+transaction
+_
+id,account
+_
+id,amount,timestamp,merchant.
+- Errors: one JSON shape {code, message, details}, via
+GlobalExceptionHandler.
+- Code quality: small classes, clear names, Javadoc on public algorithm
+methods stating time and space complexity, no dead code, no TODOs left.
+- UI and copy rules: no emoji anywhere, no em dashes (use commas, colons or
+full stops), no invented metrics, counters, reviews, testimonials or
+user logos, no hype taglines, no stock or AI-generated images. Every
+number shown in the UI comes from an API response or from the committed
+benchmark results file. Icons only from lucide-react.
+- github repo link - https://github.com/Krrishkothari/Fraud-and-Duplicate-Transaction-Screener.git
+and remember all commits should be under my name only
