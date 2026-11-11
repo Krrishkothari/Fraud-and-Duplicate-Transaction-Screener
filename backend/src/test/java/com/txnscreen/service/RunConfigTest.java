@@ -66,4 +66,21 @@ class RunConfigTest {
         assertEquals(List.of("bucketSeconds", "expectedInsertions", "hashCount", "percentile", "seed", "targetFpr"),
                 fields);
     }
+
+    // Proves the upper bounds: 10,000,000 expected insertions, 30 hashes, 86,400 second buckets and percentile
+    // 100 are allowed, and one past each is not.
+    @Test
+    void upperBoundsAreInclusive() {
+        RunConfig atLimit = new RunConfig(10_000_000, 0.999, 30, 86_400, 100.0, (long) Integer.MAX_VALUE);
+        RunConfig pastLimit = new RunConfig(10_000_001, null, 31, 86_401, 100.5, null);
+
+        List<String> fields = validator.validate(pastLimit).stream()
+                .map(violation -> violation.getPropertyPath().toString())
+                .sorted()
+                .toList();
+
+        assertAll(
+                () -> assertEquals(Set.of(), validator.validate(atLimit)),
+                () -> assertEquals(List.of("bucketSeconds", "expectedInsertions", "hashCount", "percentile"), fields));
+    }
 }

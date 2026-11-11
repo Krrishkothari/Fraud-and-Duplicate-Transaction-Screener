@@ -87,6 +87,24 @@ public final class BloomMath {
         return Math.pow(fillRatio, k);
     }
 
+    /**
+     * Returns the bytes needed to store m bits as whole 64-bit words: ceil(m / 64) * 8.
+     *
+     * <p>Time complexity: O(1). Space complexity: O(1).
+     *
+     * @param m the number of bits, at least 1
+     * @return the size of the bit array in bytes
+     * @throws IllegalArgumentException if m is out of range
+     */
+    public static long memoryBytes(long m) {
+        requireBits(m);
+        return wordCount(m) * Long.BYTES;
+    }
+
+    static long wordCount(long m) {
+        return (m + Long.SIZE - 1) / Long.SIZE;
+    }
+
     static void requireKeys(long n) {
         if (n < 1) {
             throw new IllegalArgumentException("Key count n must be at least 1, was " + n);

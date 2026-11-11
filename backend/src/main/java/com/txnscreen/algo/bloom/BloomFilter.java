@@ -41,7 +41,7 @@ public final class BloomFilter {
         this.bitSize = mBits;
         this.hashCount = k;
         this.seed = seed;
-        this.words = new long[(int) ((mBits + Long.SIZE - 1) / Long.SIZE)];
+        this.words = new long[(int) BloomMath.wordCount(mBits)];
     }
 
     /**

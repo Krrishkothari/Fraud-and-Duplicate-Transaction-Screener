@@ -1,5 +1,6 @@
 package com.txnscreen.api;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -169,15 +170,17 @@ class RunControllerTest {
                 .andExpect(jsonPath("$.details.rejectedRows[0].reason").value("AMOUNT_NOT_POSITIVE"));
     }
 
-    // Proves an invalid config part is refused with the failing field named.
+    // Proves an invalid config part is refused with every failing field named.
     @Test
     void invalidConfigPartIsRefused() throws Exception {
         mockMvc.perform(multipart("/api/runs")
                         .file(csv("transactions", TRANSACTIONS))
-                        .file(json("config", "{\"targetFpr\":1.5}")))
+                        .file(json("config", "{\"expectedInsertions\":10000001,\"targetFpr\":1.5,"
+                                + "\"hashCount\":0,\"bucketSeconds\":0,\"percentile\":0,\"seed\":-1}")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_CONFIG"))
-                .andExpect(jsonPath("$.details.fieldErrors[0].field").value("targetFpr"));
+                .andExpect(jsonPath("$.details.fieldErrors[*].field", containsInAnyOrder("expectedInsertions",
+                        "targetFpr", "hashCount", "bucketSeconds", "percentile", "seed")));
     }
 
     // Proves upload errors return the standard error shape instead of a server error.
