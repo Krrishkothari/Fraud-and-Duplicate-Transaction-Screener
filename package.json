@@ -1,0 +1,12 @@
+{
+  "name": "txnscreen",
+  "private": true,
+  "description": "Runs the TxnScreen backend and frontend together for local development",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs"
+  }
+}
