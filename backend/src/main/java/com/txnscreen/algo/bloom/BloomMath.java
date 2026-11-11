@@ -5,8 +5,12 @@ package com.txnscreen.algo.bloom;
  */
 public final class BloomMath {
 
-    static final int MIN_HASHES = 1;
-    static final int MAX_HASHES = 30;
+    /** The smallest allowed hash count k. */
+    public static final int MIN_HASHES = 1;
+
+    /** The largest allowed hash count k. */
+    public static final int MAX_HASHES = 30;
+
     private static final double LN2 = Math.log(2);
     private static final double LN2_SQUARED = LN2 * LN2;
 
