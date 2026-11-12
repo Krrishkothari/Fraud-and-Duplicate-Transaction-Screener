@@ -27,20 +27,23 @@ public class RunService {
 
     private final ScreeningService screeningService;
     private final AnalyticsService analyticsService;
+    private final ThresholdService thresholdService;
     private final RunStore runStore;
     private final Clock clock;
 
-    public RunService(ScreeningService screeningService, AnalyticsService analyticsService, RunStore runStore,
-            Clock clock) {
+    public RunService(ScreeningService screeningService, AnalyticsService analyticsService,
+            ThresholdService thresholdService, RunStore runStore, Clock clock) {
         this.screeningService = screeningService;
         this.analyticsService = analyticsService;
+        this.thresholdService = thresholdService;
         this.runStore = runStore;
         this.clock = clock;
     }
 
     /**
-     * Screens the valid transactions, builds the time window index and stores the run. Screening and the
-     * index build are timed separately.
+     * Screens the valid transactions, sets the high amount threshold from the configured percentile of every
+     * valid amount and flags the amounts strictly above it, builds the time window index and stores the run.
+     * Screening, the threshold and the index build are timed separately.
      *
      * @param parsed the parsed upload
      * @param blacklist the blacklisted account IDs, which may be empty
@@ -63,8 +66,15 @@ public class RunService {
         ScreeningResult screening = screeningService.screenAll(parsed.valid(), blacklist, config);
         long screeningMicros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - start);
 
-        Run run = new Run(UUID.randomUUID(), clock.instant(), config, parsed.valid(), parsed.rejected(), screening,
+        ThresholdResult threshold = thresholdService.compute(ThresholdService.amounts(parsed.valid()),
+                config.percentile(), config.seed());
+        ScreeningResult flagged = new ScreeningResult(screening.screener(),
+                thresholdService.withHighAmountFlags(parsed.valid(), screening.flags(), threshold),
+                screening.blacklistStats(), screening.duplicateStats(), screening.warnings());
+
+        Run run = new Run(UUID.randomUUID(), clock.instant(), config, parsed.valid(), parsed.rejected(), flagged,
                 screeningMicros);
+        run.setThreshold(threshold);
         analyticsService.attachIndex(run);
         runStore.save(run);
         return run;

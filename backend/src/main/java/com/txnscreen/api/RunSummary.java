@@ -13,6 +13,7 @@ import com.txnscreen.service.FilterStats;
 import com.txnscreen.service.Run;
 import com.txnscreen.service.RunConfig;
 import com.txnscreen.service.ScreeningResult;
+import com.txnscreen.service.ThresholdResult;
 
 /**
  * The response for one run: row counts, flag counts, filter stats and the screening time.
@@ -30,6 +31,7 @@ import com.txnscreen.service.ScreeningResult;
  * @param warnings plain sentences about the run an analyst should know
  * @param algoMicros how long screening took, in microseconds
  * @param analyticsBuildMicros how long building the time window index took, in microseconds
+ * @param threshold the high amount threshold set when the run was created
  */
 public record RunSummary(
         UUID id,
@@ -44,7 +46,8 @@ public record RunSummary(
         RunConfig config,
         List<String> warnings,
         long algoMicros,
-        long analyticsBuildMicros) {
+        long analyticsBuildMicros,
+        ThresholdResult threshold) {
 
     /**
      * Summarises a run, which always has at least one valid transaction.
@@ -58,7 +61,7 @@ public record RunSummary(
         return new RunSummary(run.id(), run.createdAt(), transactions.size(), run.rejected().size(),
                 countByType(screening.flags()), screening.blacklistStats(), screening.duplicateStats(),
                 transactions.getFirst().epochSeconds(), transactions.getLast().epochSeconds(), run.config(),
-                screening.warnings(), run.screeningMicros(), run.analyticsBuildMicros());
+                screening.warnings(), run.screeningMicros(), run.analyticsBuildMicros(), run.threshold());
     }
 
     private static Map<FlagType, Long> countByType(List<Flag> flags) {

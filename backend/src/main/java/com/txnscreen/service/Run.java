@@ -10,8 +10,7 @@ import com.txnscreen.domain.Transaction;
 
 /**
  * One screened upload or generated sample, kept in the {@link RunStore} so its results can be paged and
- * analysed. The analytics index is attached when the run is created; the high amount threshold starts empty
- * and is filled on first use.
+ * analysed. The analytics index and the high amount threshold are attached when the run is created.
  *
  * <p>The analytics index is not thread safe, so every read or update of it must hold {@link #lock()}.
  */
@@ -27,7 +26,7 @@ public final class Run {
     private final long screeningMicros;
     private volatile TimeWindowIndex analyticsIndex;
     private volatile long analyticsBuildMicros;
-    private volatile Long thresholdPaise;
+    private volatile ThresholdResult threshold;
 
     /**
      * Creates a run.
@@ -119,15 +118,16 @@ public final class Run {
     }
 
     /**
-     * Returns the high amount threshold in paise, or null until it has been computed.
+     * Returns the high amount threshold set when the run was created, from the configured percentile of
+     * every valid amount. Amounts strictly above its value are flagged HIGH_AMOUNT.
      *
-     * @return the threshold, or null
+     * @return the threshold, or null before it is attached
      */
-    public Long thresholdPaise() {
-        return thresholdPaise;
+    public ThresholdResult threshold() {
+        return threshold;
     }
 
-    public void setThresholdPaise(Long thresholdPaise) {
-        this.thresholdPaise = thresholdPaise;
+    public void setThreshold(ThresholdResult threshold) {
+        this.threshold = threshold;
     }
 }
