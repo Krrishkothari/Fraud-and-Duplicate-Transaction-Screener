@@ -29,6 +29,7 @@ import com.txnscreen.service.ScreeningResult;
  * @param config the run settings
  * @param warnings plain sentences about the run an analyst should know
  * @param algoMicros how long screening took, in microseconds
+ * @param analyticsBuildMicros how long building the time window index took, in microseconds
  */
 public record RunSummary(
         UUID id,
@@ -42,7 +43,8 @@ public record RunSummary(
         long dataEnd,
         RunConfig config,
         List<String> warnings,
-        long algoMicros) {
+        long algoMicros,
+        long analyticsBuildMicros) {
 
     /**
      * Summarises a run, which always has at least one valid transaction.
@@ -56,7 +58,7 @@ public record RunSummary(
         return new RunSummary(run.id(), run.createdAt(), transactions.size(), run.rejected().size(),
                 countByType(screening.flags()), screening.blacklistStats(), screening.duplicateStats(),
                 transactions.getFirst().epochSeconds(), transactions.getLast().epochSeconds(), run.config(),
-                screening.warnings(), run.screeningMicros());
+                screening.warnings(), run.screeningMicros(), run.analyticsBuildMicros());
     }
 
     private static Map<FlagType, Long> countByType(List<Flag> flags) {

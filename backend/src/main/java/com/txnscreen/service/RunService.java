@@ -26,24 +26,29 @@ public class RunService {
     public static final int MAX_REJECTED_IN_ERROR = 50;
 
     private final ScreeningService screeningService;
+    private final AnalyticsService analyticsService;
     private final RunStore runStore;
     private final Clock clock;
 
-    public RunService(ScreeningService screeningService, RunStore runStore, Clock clock) {
+    public RunService(ScreeningService screeningService, AnalyticsService analyticsService, RunStore runStore,
+            Clock clock) {
         this.screeningService = screeningService;
+        this.analyticsService = analyticsService;
         this.runStore = runStore;
         this.clock = clock;
     }
 
     /**
-     * Screens the valid transactions and stores the run. Only the screening is timed.
+     * Screens the valid transactions, builds the time window index and stores the run. Screening and the
+     * index build are timed separately.
      *
      * @param parsed the parsed upload
      * @param blacklist the blacklisted account IDs, which may be empty
      * @param config the run settings
      * @return the stored run
      * @throws ApiException 422 NO_VALID_ROWS with the first {@link #MAX_REJECTED_IN_ERROR} rejected rows if
-     *         every row is invalid, or 400 INVALID_CONFIG if a filter would be too large
+     *         every row is invalid, 400 INVALID_CONFIG if a filter would be too large, or 422
+     *         TOO_MANY_BUCKETS if the time range needs more buckets than the index allows
      */
     public Run createRun(ParseResult parsed, Set<String> blacklist, RunConfig config) {
         if (parsed.valid().isEmpty()) {
@@ -60,6 +65,7 @@ public class RunService {
 
         Run run = new Run(UUID.randomUUID(), clock.instant(), config, parsed.valid(), parsed.rejected(), screening,
                 screeningMicros);
+        analyticsService.attachIndex(run);
         runStore.save(run);
         return run;
     }

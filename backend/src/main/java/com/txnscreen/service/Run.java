@@ -10,10 +10,14 @@ import com.txnscreen.domain.Transaction;
 
 /**
  * One screened upload or generated sample, kept in the {@link RunStore} so its results can be paged and
- * analysed. The analytics index and the high amount threshold start empty and are filled on first use.
+ * analysed. The analytics index is attached when the run is created; the high amount threshold starts empty
+ * and is filled on first use.
+ *
+ * <p>The analytics index is not thread safe, so every read or update of it must hold {@link #lock()}.
  */
 public final class Run {
 
+    private final Object lock = new Object();
     private final UUID id;
     private final Instant createdAt;
     private final RunConfig config;
@@ -22,6 +26,7 @@ public final class Run {
     private final ScreeningResult screening;
     private final long screeningMicros;
     private volatile TimeWindowIndex analyticsIndex;
+    private volatile long analyticsBuildMicros;
     private volatile Long thresholdPaise;
 
     /**
@@ -83,8 +88,34 @@ public final class Run {
         return analyticsIndex;
     }
 
-    public void setAnalyticsIndex(TimeWindowIndex analyticsIndex) {
+    /**
+     * Returns how long building the analytics index took, in microseconds.
+     *
+     * @return the build time, or 0 before the index is attached
+     */
+    public long analyticsBuildMicros() {
+        return analyticsBuildMicros;
+    }
+
+    /**
+     * Attaches the time window index built over this run's transactions.
+     *
+     * @param analyticsIndex the index
+     * @param buildMicros how long building it took, in microseconds
+     */
+    public void setAnalytics(TimeWindowIndex analyticsIndex, long buildMicros) {
         this.analyticsIndex = analyticsIndex;
+        this.analyticsBuildMicros = buildMicros;
+    }
+
+    /**
+     * Returns the object to synchronise on while reading or updating the analytics index, so live appends
+     * and window queries never interleave.
+     *
+     * @return the run's lock
+     */
+    public Object lock() {
+        return lock;
     }
 
     /**

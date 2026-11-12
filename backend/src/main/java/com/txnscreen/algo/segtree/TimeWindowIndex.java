@@ -2,6 +2,7 @@ package com.txnscreen.algo.segtree;
 
 import com.txnscreen.api.ApiException;
 import com.txnscreen.domain.Transaction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -166,9 +167,46 @@ public final class TimeWindowIndex {
         long effectiveFrom = Math.max(fromEpoch, dataStart);
         long effectiveTo = Math.min(toEpoch, dataEnd);
         boolean clamped = effectiveFrom != fromEpoch || effectiveTo != toEpoch;
-        int l = (int) ((effectiveFrom - t0) / bucketSeconds);
-        int r = (int) ((effectiveTo - t0) / bucketSeconds);
-        return new WindowResult(tree.query(l, r), effectiveFrom, effectiveTo, clamped);
+        return new WindowResult(tree.query(bucketOf(effectiveFrom), bucketOf(effectiveTo)), effectiveFrom,
+                effectiveTo, clamped);
+    }
+
+    /**
+     * Splits the window from fromEpoch to toEpoch into consecutive windows and answers each with one
+     * segment tree query. The window is first clamped and checked exactly as {@link #query} does.
+     *
+     * <p>The split follows bucket boundaries, so every bucket in the window belongs to exactly one
+     * part and the counts of the parts add up to the count of the whole window. When the window
+     * covers fewer buckets than requested, one part per bucket is returned.
+     *
+     * <p>Time complexity: O(p log B) for p parts. Space complexity: O(p).
+     *
+     * @param fromEpoch the window start, in epoch seconds
+     * @param toEpoch the window end, in epoch seconds
+     * @param points the number of parts wanted, at least 1
+     * @return the parts in time order, each with its own bounds and the clamped flag of the whole
+     *     window
+     * @throws IllegalArgumentException if points is less than 1
+     * @throws ApiException 400 INVALID_WINDOW or 400 WINDOW_OUT_OF_RANGE, as for {@link #query}
+     */
+    public List<WindowResult> series(long fromEpoch, long toEpoch, int points) {
+        if (points < 1) {
+            throw new IllegalArgumentException("points must be at least 1, got " + points);
+        }
+        WindowResult whole = query(fromEpoch, toEpoch);
+        int firstBucket = bucketOf(whole.effectiveFrom());
+        int buckets = bucketOf(whole.effectiveTo()) - firstBucket + 1;
+        int parts = Math.min(points, buckets);
+
+        List<WindowResult> series = new ArrayList<>(parts);
+        for (int i = 0; i < parts; i++) {
+            int lo = firstBucket + (int) ((long) i * buckets / parts);
+            int hi = firstBucket + (int) ((long) (i + 1) * buckets / parts) - 1;
+            long from = Math.max(t0 + (long) lo * bucketSeconds, whole.effectiveFrom());
+            long to = Math.min(t0 + (long) (hi + 1) * bucketSeconds - 1, whole.effectiveTo());
+            series.add(new WindowResult(tree.query(lo, hi), from, to, whole.clamped()));
+        }
+        return series;
     }
 
     /**
@@ -218,6 +256,10 @@ public final class TimeWindowIndex {
         leafCount = Arrays.copyOf(leafCount, newCapacity);
         leafMax = Arrays.copyOf(leafMax, newCapacity);
         tree = SegmentTree.build(leafSum, leafCount, leafMax);
+    }
+
+    private int bucketOf(long epochSeconds) {
+        return (int) ((epochSeconds - t0) / bucketSeconds);
     }
 
     private static int checkedBucketCount(long lastBucket, int bucketSeconds) {

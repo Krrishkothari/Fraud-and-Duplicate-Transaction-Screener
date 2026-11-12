@@ -139,6 +139,32 @@ class TimeWindowIndexTest {
                         index.query(BASE, BASE + 59).stats()));
     }
 
+    // Proves a series splits on bucket boundaries, so no bucket is counted twice across parts.
+    @Test
+    void seriesSplitsOnBucketBoundaries() {
+        TimeWindowIndex index = sampleIndex();
+
+        List<WindowResult> halves = index.series(BASE + 10, BASE + 250, 2);
+        List<WindowResult> perBucket = index.series(BASE + 10, BASE + 250, 120);
+        List<WindowResult> clamped = index.series(BASE - 100, BASE + 70, 3);
+
+        assertAll(
+                () -> assertEquals(List.of(
+                        new WindowResult(new NodeStats(4500, 3, 3000), BASE + 10, BASE + 119, false),
+                        new WindowResult(new NodeStats(7000, 1, 7000), BASE + 120, BASE + 250, false)),
+                        halves),
+                () -> assertEquals(5, perBucket.size()),
+                () -> assertEquals(4, perBucket.stream().mapToLong(w -> w.stats().count()).sum()),
+                () -> assertEquals(2, clamped.size()),
+                () -> assertTrue(clamped.getFirst().clamped()),
+                () -> assertEquals(BASE + 10, clamped.getFirst().effectiveFrom()),
+                () -> assertEquals(BASE + 70, clamped.getLast().effectiveTo()),
+                () -> assertThrows(IllegalArgumentException.class,
+                        () -> index.series(BASE, BASE + 250, 0)),
+                () -> assertEquals("WINDOW_OUT_OF_RANGE", assertThrows(ApiException.class,
+                        () -> index.series(BASE + 251, BASE + 999, 10)).getCode()));
+    }
+
     // Proves invalid build input is rejected instead of producing an unusable index.
     @Test
     void rejectsInvalidBuildInput() {
