@@ -265,3 +265,77 @@
 .empty-state-action {
   margin-top: var(--space-2);
 }
+
+/* Segmented control */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+}
+
+.segmented-option {
+  min-height: 36px;
+  padding: var(--space-1) var(--space-4);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--gray-700);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.segmented-option:hover {
+  color: var(--gray-900);
+}
+
+.segmented-option[aria-checked='true'] {
+  background: var(--white);
+  border-color: var(--gray-300);
+  color: var(--gray-900);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Filter plan */
+.filter-plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-self: start;
+  padding: var(--space-4);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+}
+
+.filter-plan-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.filter-plan-note {
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+}
+
+.plan-values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.plan-values dt {
+  color: var(--gray-600);
+  font-size: 0.75rem;
+}
+
+.plan-values dd {
+  margin: 0;
+  font-size: var(--text-md);
+}
