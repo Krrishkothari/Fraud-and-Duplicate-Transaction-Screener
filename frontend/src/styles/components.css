@@ -11,6 +11,7 @@
   font: inherit;
   font-size: var(--text-sm);
   font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -60,6 +61,107 @@
   margin-bottom: var(--space-4);
   font-size: var(--text-lg);
   font-weight: 600;
+}
+
+.card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.panel-note {
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+}
+
+.panel-loading {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--space-6);
+}
+
+/* Disclosure: a card whose body opens from a button in its title */
+.disclosure-title {
+  margin-bottom: 0;
+}
+
+.disclosure {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.disclosure-icon {
+  transition: transform 0.15s ease;
+}
+
+.disclosure[aria-expanded='true'] .disclosure-icon {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure-icon {
+    transition: none;
+  }
+}
+
+.disclosure-count {
+  padding: 0 var(--space-2);
+  background: var(--gray-100);
+  border-radius: var(--radius);
+  color: var(--gray-700);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.disclosure-body {
+  margin-top: var(--space-4);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.pagination-status {
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+}
+
+/* Summary values */
+.summary-values {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.summary-values dt {
+  color: var(--gray-600);
+  font-size: var(--text-sm);
+}
+
+.summary-values dd {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.summary-values .summary-wide {
+  grid-column: 1 / -1;
+}
+
+.summary-values .summary-wide dd {
+  font-size: var(--text-md);
 }
 
 /* Table: scrolls inside its wrapper, so the header can stay in view */

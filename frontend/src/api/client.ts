@@ -2,6 +2,10 @@ import type {
   ApiErrorBody,
   BloomPlan,
   FieldViolation,
+  FlaggedTransaction,
+  FlagType,
+  PageResponse,
+  RejectedRow,
   RunConfigInput,
   RunSummary,
   SampleRunRequest,
@@ -37,6 +41,13 @@ export class ApiError extends Error {
     const errors = this.details.fieldErrors
     return Array.isArray(errors) ? (errors as FieldViolation[]) : []
   }
+}
+
+/** Returns a caught error as an ApiError, wrapping anything else in a generic one. */
+export function asApiError(caught: unknown): ApiError {
+  return caught instanceof ApiError
+    ? caught
+    : new ApiError('UNEXPECTED_ERROR', 'Something went wrong. Try again.', 0)
 }
 
 export interface RequestOptions {
@@ -169,6 +180,55 @@ export function createRun(
     '/api/runs',
     { method: 'POST', body: form },
     { onSlow },
+  )
+}
+
+/** GET /api/runs/{id}: the summary of a run that has not expired. */
+export function getRun(id: string, signal?: AbortSignal): Promise<RunSummary> {
+  return request<RunSummary>(
+    `/api/runs/${encodeURIComponent(id)}`,
+    {},
+    { signal },
+  )
+}
+
+/** GET /api/runs/{id}/flags: one page of flagged transactions, of one type or of every type when null. */
+export function getFlags(
+  id: string,
+  type: FlagType | null,
+  page: number,
+  size: number,
+  signal?: AbortSignal,
+): Promise<PageResponse<FlaggedTransaction>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  })
+  if (type !== null) {
+    params.set('type', type)
+  }
+  return request<PageResponse<FlaggedTransaction>>(
+    `/api/runs/${encodeURIComponent(id)}/flags?${params}`,
+    {},
+    { signal },
+  )
+}
+
+/** GET /api/runs/{id}/rejected: one page of rejected rows in file order. */
+export function getRejected(
+  id: string,
+  page: number,
+  size: number,
+  signal?: AbortSignal,
+): Promise<PageResponse<RejectedRow>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  })
+  return request<PageResponse<RejectedRow>>(
+    `/api/runs/${encodeURIComponent(id)}/rejected?${params}`,
+    {},
+    { signal },
   )
 }
 

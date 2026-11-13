@@ -22,3 +22,60 @@ export function formatBytes(bytes: number): string {
 export function formatPercent(fraction: number): string {
   return `${(fraction * 100).toFixed(3)}%`
 }
+
+/** A positive amount in paise as rupees with 2 decimals and Indian grouping, such as 1234567 shown as 12,345.67. */
+export function formatRupees(paise: number): string {
+  const rupees = Math.floor(paise / 100)
+  const remainder = String(paise % 100).padStart(2, '0')
+  return `${integer.format(rupees)}.${remainder}`
+}
+
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
+
+const kolkataParts = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Asia/Kolkata',
+  day: '2-digit',
+  month: 'numeric',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+})
+
+/** An instant in Asia/Kolkata time, such as 14 Mar 2026, 09:26 or 04 Sep 2026, 08:36. */
+export function formatDateTime(date: Date): string {
+  const parts: Record<string, string> = {}
+  for (const part of kolkataParts.formatToParts(date)) {
+    parts[part.type] = part.value
+  }
+  const month = MONTHS[Number(parts.month) - 1]
+  return `${parts.day} ${month} ${parts.year}, ${parts.hour}:${parts.minute}`
+}
+
+/** Epoch seconds in Asia/Kolkata time, as formatDateTime shows them. */
+export function formatEpochSeconds(epochSeconds: number): string {
+  return formatDateTime(new Date(epochSeconds * 1000))
+}
+
+const millis = new Intl.NumberFormat('en-IN', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+/** A duration in microseconds as milliseconds with 2 decimals, such as 1534 shown as 1.53 ms. */
+export function formatMillis(micros: number): string {
+  return `${millis.format(micros / 1000)} ms`
+}

@@ -82,6 +82,12 @@ export interface Flag {
   detail: string
 }
 
+/** One flag with the transaction it was raised on. A transaction with two flags appears once per flag. */
+export interface FlaggedTransaction extends Transaction {
+  type: FlagType
+  detail: string
+}
+
 export interface RejectedRow {
   lineNumber: number
   reason: RejectReason

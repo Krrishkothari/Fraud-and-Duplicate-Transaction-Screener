@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ApiError, createRun, createSampleRun } from '../api/client'
+import { ApiError, asApiError, createRun, createSampleRun } from '../api/client'
 import type { RunConfigInput } from '../api/types'
 import Alert from '../components/Alert'
 import Button from '../components/Button'
@@ -107,14 +107,7 @@ function ScreenPage() {
             )
       navigate(`/runs/${summary.id}`)
     } catch (caught) {
-      const apiError =
-        caught instanceof ApiError
-          ? caught
-          : new ApiError(
-              'UNEXPECTED_ERROR',
-              'Something went wrong. Try again.',
-              0,
-            )
+      const apiError = asApiError(caught)
       setError(apiError)
       setFieldErrors(serverFieldErrors(apiError, mode))
     } finally {
