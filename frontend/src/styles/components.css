@@ -124,6 +124,122 @@
   margin-top: var(--space-4);
 }
 
+/* Info tooltip: the bubble sits under the nearest positioned ancestor, such as a stat row */
+.info-tip {
+  display: inline-flex;
+}
+
+.info-tip-button {
+  display: inline-flex;
+  padding: 2px;
+  background: none;
+  border: 0;
+  border-radius: var(--radius);
+  color: var(--gray-600);
+  cursor: help;
+}
+
+.info-tip-button:hover {
+  color: var(--gray-900);
+}
+
+.info-tip-bubble {
+  position: absolute;
+  top: calc(100% - var(--space-1));
+  left: 0;
+  z-index: 10;
+  width: max-content;
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--gray-900);
+  border-radius: var(--radius);
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.info-tip-bubble[hidden] {
+  display: none;
+}
+
+/* Bloom filter stats */
+.filter-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 760px) {
+  .filter-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.filter-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+}
+
+.filter-card-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.stat-rows {
+  margin: 0;
+}
+
+.stat-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--gray-200);
+  font-size: var(--text-sm);
+}
+
+.stat-row:last-child {
+  border-bottom: 0;
+}
+
+.stat-row dt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--gray-600);
+}
+
+.stat-row dd {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.fill-bar {
+  width: 64px;
+  height: 4px;
+  overflow: hidden;
+  background: var(--gray-200);
+  border-radius: 2px;
+}
+
+.fill-bar-value {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
 /* Pagination */
 .pagination {
   display: flex;

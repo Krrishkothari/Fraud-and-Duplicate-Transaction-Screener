@@ -18,9 +18,9 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-/** A fraction such as 0.01 as a percentage with 3 decimals, such as 1.000%. */
-export function formatPercent(fraction: number): string {
-  return `${(fraction * 100).toFixed(3)}%`
+/** A fraction such as 0.01 as a percentage, with 3 decimals unless told otherwise, such as 1.000%. */
+export function formatPercent(fraction: number, decimals = 3): string {
+  return `${(fraction * 100).toFixed(decimals)}%`
 }
 
 /** A positive amount in paise as rupees with 2 decimals and Indian grouping, such as 1234567 shown as 12,345.67. */
