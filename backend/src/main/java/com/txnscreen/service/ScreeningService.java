@@ -42,6 +42,20 @@ public class ScreeningService {
             flags.addAll(screener.screenOne(transaction));
         }
 
+        return snapshot(screener, flags);
+    }
+
+    /**
+     * Captures a screener's current filter stats and warnings together with the given flags. Used after the
+     * batch screen and again after every live append, so the stats and warnings always agree.
+     *
+     * <p>Time complexity: O(f + m / 64) for f flags and m total filter bits. Space complexity: O(f).
+     *
+     * @param screener the screener
+     * @param flags every flag raised so far, in screening order
+     * @return the screening result
+     */
+    static ScreeningResult snapshot(Screener screener, List<Flag> flags) {
         FilterStats blacklistStats = screener.blacklistStats();
         FilterStats duplicateStats = screener.duplicateStats();
         List<String> warnings = new ArrayList<>();

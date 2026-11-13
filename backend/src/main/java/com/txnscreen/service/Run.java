@@ -3,6 +3,7 @@ package com.txnscreen.service;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.txnscreen.algo.segtree.TimeWindowIndex;
 import com.txnscreen.domain.RejectedRow;
@@ -12,7 +13,9 @@ import com.txnscreen.domain.Transaction;
  * One screened upload or generated sample, kept in the {@link RunStore} so its results can be paged and
  * analysed. The analytics index and the high amount threshold are attached when the run is created.
  *
- * <p>The analytics index is not thread safe, so every read or update of it must hold {@link #lock()}.
+ * <p>The analytics index and the screener are not thread safe, so every read or update of them, and every call
+ * to {@link #insertTransaction}, must hold {@link #lock()}. The transaction list and the screening result can be
+ * read without the lock: the list is copy-on-write and the screening result is replaced as a whole.
  */
 public final class Run {
 
@@ -22,8 +25,9 @@ public final class Run {
     private final RunConfig config;
     private final List<Transaction> transactions;
     private final List<RejectedRow> rejected;
-    private final ScreeningResult screening;
     private final long screeningMicros;
+    private volatile ScreeningResult screening;
+    private int nextLineNumber;
     private volatile TimeWindowIndex analyticsIndex;
     private volatile long analyticsBuildMicros;
     private volatile ThresholdResult threshold;
@@ -44,10 +48,11 @@ public final class Run {
         this.id = id;
         this.createdAt = createdAt;
         this.config = config;
-        this.transactions = List.copyOf(transactions);
+        this.transactions = new CopyOnWriteArrayList<>(transactions);
         this.rejected = List.copyOf(rejected);
         this.screening = screening;
         this.screeningMicros = screeningMicros;
+        this.nextLineNumber = lastLineNumber(transactions, rejected) + 1;
     }
 
     public UUID id() {
@@ -62,6 +67,12 @@ public final class Run {
         return config;
     }
 
+    /**
+     * Returns the valid transactions sorted by time, including any appended live. Transactions with equal
+     * times keep the order they arrived in.
+     *
+     * @return the transactions, as a live view that other threads may extend
+     */
     public List<Transaction> transactions() {
         return transactions;
     }
@@ -70,8 +81,65 @@ public final class Run {
         return rejected;
     }
 
+    /**
+     * Returns the screening outcome as of the latest append.
+     *
+     * @return the screening result
+     */
     public ScreeningResult screening() {
         return screening;
+    }
+
+    /**
+     * Returns the screener that holds this run's Bloom filters and exact stores, so live transactions are
+     * screened exactly like the batch. The caller must hold {@link #lock()}.
+     *
+     * @return the screener
+     */
+    public Screener screener() {
+        return screening.screener();
+    }
+
+    /**
+     * Replaces the screening outcome after a live append.
+     *
+     * @param screening the new screening result
+     */
+    public void setScreening(ScreeningResult screening) {
+        this.screening = screening;
+    }
+
+    /**
+     * Returns the file line number the next live transaction gets: one after the last line of the original
+     * file, or after the last live transaction. The caller must hold {@link #lock()}.
+     *
+     * @return the next line number
+     */
+    public int nextLineNumber() {
+        return nextLineNumber;
+    }
+
+    /**
+     * Adds a live transaction at its place in time order, after any existing transactions with the same
+     * time, and moves the next line number past it. The caller must hold {@link #lock()}.
+     *
+     * <p>Time complexity: O(log n) to find the place plus O(n) to copy the list. Space complexity: O(n).
+     *
+     * @param transaction the transaction, whose line number is {@link #nextLineNumber()}
+     */
+    public void insertTransaction(Transaction transaction) {
+        int low = 0;
+        int high = transactions.size();
+        while (low < high) {
+            int middle = (low + high) >>> 1;
+            if (transactions.get(middle).epochSeconds() <= transaction.epochSeconds()) {
+                low = middle + 1;
+            } else {
+                high = middle;
+            }
+        }
+        transactions.add(low, transaction);
+        nextLineNumber = transaction.lineNumber() + 1;
     }
 
     public long screeningMicros() {
@@ -129,5 +197,16 @@ public final class Run {
 
     public void setThreshold(ThresholdResult threshold) {
         this.threshold = threshold;
+    }
+
+    private static int lastLineNumber(List<Transaction> transactions, List<RejectedRow> rejected) {
+        int last = 1;
+        for (Transaction transaction : transactions) {
+            last = Math.max(last, transaction.lineNumber());
+        }
+        for (RejectedRow row : rejected) {
+            last = Math.max(last, row.lineNumber());
+        }
+        return last;
     }
 }

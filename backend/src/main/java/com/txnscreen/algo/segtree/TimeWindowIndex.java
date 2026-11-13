@@ -167,7 +167,7 @@ public final class TimeWindowIndex {
         long effectiveFrom = Math.max(fromEpoch, dataStart);
         long effectiveTo = Math.min(toEpoch, dataEnd);
         boolean clamped = effectiveFrom != fromEpoch || effectiveTo != toEpoch;
-        return new WindowResult(tree.query(bucketOf(effectiveFrom), bucketOf(effectiveTo)), effectiveFrom,
+        return new WindowResult(tree.query(bucketIndex(effectiveFrom), bucketIndex(effectiveTo)), effectiveFrom,
                 effectiveTo, clamped);
     }
 
@@ -194,8 +194,8 @@ public final class TimeWindowIndex {
             throw new IllegalArgumentException("points must be at least 1, got " + points);
         }
         WindowResult whole = query(fromEpoch, toEpoch);
-        int firstBucket = bucketOf(whole.effectiveFrom());
-        int buckets = bucketOf(whole.effectiveTo()) - firstBucket + 1;
+        int firstBucket = bucketIndex(whole.effectiveFrom());
+        int buckets = bucketIndex(whole.effectiveTo()) - firstBucket + 1;
         int parts = Math.min(points, buckets);
 
         List<WindowResult> series = new ArrayList<>(parts);
@@ -258,7 +258,16 @@ public final class TimeWindowIndex {
         tree = SegmentTree.build(leafSum, leafCount, leafMax);
     }
 
-    private int bucketOf(long epochSeconds) {
+    /**
+     * Returns the index of the bucket that holds a timestamp. The timestamp need not lie inside the data
+     * range, so the result may be negative or past the last bucket.
+     *
+     * <p>Time complexity: O(1). Space complexity: O(1).
+     *
+     * @param epochSeconds the timestamp, in epoch seconds
+     * @return the bucket index
+     */
+    public int bucketIndex(long epochSeconds) {
         return (int) ((epochSeconds - t0) / bucketSeconds);
     }
 

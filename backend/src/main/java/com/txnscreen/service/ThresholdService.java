@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.http.HttpStatus;
@@ -103,8 +104,7 @@ public class ThresholdService {
      */
     public List<Flag> withHighAmountFlags(List<Transaction> transactions, List<Flag> screeningFlags,
             ThresholdResult threshold) {
-        String detail = "Above P" + BigDecimal.valueOf(threshold.percentile()).stripTrailingZeros().toPlainString()
-                + " threshold of " + Money.format(threshold.valuePaise());
+        String detail = highAmountDetail(threshold);
         List<Flag> flags = new ArrayList<>(screeningFlags.size() + (int) threshold.countAbove());
         int next = 0;
         for (Transaction t : transactions) {
@@ -116,6 +116,37 @@ public class ThresholdService {
             }
         }
         return flags;
+    }
+
+    /**
+     * Returns the HIGH_AMOUNT flag for one transaction if its amount is strictly above the threshold.
+     *
+     * <p>Time complexity: O(1). Space complexity: O(1).
+     *
+     * @param transaction the transaction
+     * @param threshold the run's threshold
+     * @return the flag, or empty if the amount is at or below the threshold
+     */
+    public Optional<Flag> highAmountFlag(Transaction transaction, ThresholdResult threshold) {
+        if (transaction.amountPaise() <= threshold.valuePaise()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Flag(transaction.transactionId(), transaction.lineNumber(), FlagType.HIGH_AMOUNT,
+                highAmountDetail(threshold)));
+    }
+
+    private static String highAmountDetail(ThresholdResult threshold) {
+        return "Above P" + percentileText(threshold) + " threshold of " + Money.format(threshold.valuePaise());
+    }
+
+    /**
+     * Returns the threshold's percentile as plain text without trailing zeros, such as 99 or 99.9.
+     *
+     * @param threshold the threshold
+     * @return the percentile text
+     */
+    static String percentileText(ThresholdResult threshold) {
+        return BigDecimal.valueOf(threshold.percentile()).stripTrailingZeros().toPlainString();
     }
 
     /**
