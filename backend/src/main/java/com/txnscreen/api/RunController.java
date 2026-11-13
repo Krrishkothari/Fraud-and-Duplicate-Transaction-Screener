@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.txnscreen.domain.Flag;
 import com.txnscreen.domain.FlagType;
 import com.txnscreen.domain.RejectedRow;
+import com.txnscreen.domain.Transaction;
 import com.txnscreen.ingest.BlacklistParser;
 import com.txnscreen.ingest.CsvTransactionParser;
 import com.txnscreen.ingest.ParseResult;
@@ -86,18 +89,21 @@ public class RunController {
     }
 
     /**
-     * Returns one page of flags in screening order, optionally of one type only.
+     * Returns one page of flags in screening order, optionally of one type only, each with its transaction.
      */
     @GetMapping("/{id}/flags")
-    public PageResponse<Flag> getFlags(
+    public PageResponse<FlaggedTransaction> getFlags(
             @PathVariable String id,
             @RequestParam(required = false) FlagType type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         requirePage(page, size);
-        List<Flag> flags = runService.getRun(id).screening().flags();
+        Run run = runService.getRun(id);
+        // Flags are read before transactions because a live append adds its transaction before its flags.
+        List<Flag> flags = run.screening().flags();
         List<Flag> matching = type == null ? flags : flags.stream().filter(flag -> flag.type() == type).toList();
-        return PageResponse.of(matching, page, size);
+        PageResponse<Flag> flagPage = PageResponse.of(matching, page, size);
+        return flagPage.withItems(withTransactions(flagPage.items(), run.transactions()));
     }
 
     /**
@@ -110,6 +116,20 @@ public class RunController {
             @RequestParam(defaultValue = "50") int size) {
         requirePage(page, size);
         return PageResponse.of(runService.getRun(id).rejected(), page, size);
+    }
+
+    private static List<FlaggedTransaction> withTransactions(List<Flag> flags, List<Transaction> transactions) {
+        Set<Integer> lines = new HashSet<>();
+        for (Flag flag : flags) {
+            lines.add(flag.lineNumber());
+        }
+        Map<Integer, Transaction> byLine = new HashMap<>();
+        for (Transaction transaction : transactions) {
+            if (lines.contains(transaction.lineNumber())) {
+                byLine.put(transaction.lineNumber(), transaction);
+            }
+        }
+        return flags.stream().map(flag -> FlaggedTransaction.of(flag, byLine.get(flag.lineNumber()))).toList();
     }
 
     private static ResponseEntity<RunSummary> created(Run run) {

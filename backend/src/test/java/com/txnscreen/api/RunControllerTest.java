@@ -87,7 +87,8 @@ class RunControllerTest {
                 .andExpect(jsonPath("$.warnings[0]").value(endsWith("checked against blacklisted accounts.")));
     }
 
-    // Proves a run can be read back, and its flags and rejected rows are paged and filtered.
+    // Proves a run can be read back, and its flags, each with its transaction, and rejected rows are paged and
+    // filtered.
     @Test
     void runCanBeReadAndPaged() throws Exception {
         String id = createRun();
@@ -101,6 +102,11 @@ class RunControllerTest {
                 .andExpect(jsonPath("$.totalItems").value(1))
                 .andExpect(jsonPath("$.items[0].transactionId").value("T1"))
                 .andExpect(jsonPath("$.items[0].lineNumber").value(4))
+                .andExpect(jsonPath("$.items[0].accountId").value("ACC1"))
+                .andExpect(jsonPath("$.items[0].amountPaise").value(10_000))
+                .andExpect(jsonPath("$.items[0].epochSeconds").value(1_767_584_400L))
+                .andExpect(jsonPath("$.items[0].merchant").value("Shop"))
+                .andExpect(jsonPath("$.items[0].type").value("DUPLICATE"))
                 .andExpect(jsonPath("$.items[0].detail").value("Duplicate of line 2"));
         mockMvc.perform(get("/api/runs/" + id + "/flags").param("page", "1").param("size", "1"))
                 .andExpect(status().isOk())

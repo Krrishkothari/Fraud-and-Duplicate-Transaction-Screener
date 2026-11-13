@@ -27,4 +27,14 @@ public record PageResponse<T>(List<T> items, int page, int size, long totalItems
         int totalPages = (all.size() + size - 1) / size;
         return new PageResponse<>(List.copyOf(all.subList(from, to)), page, size, all.size(), totalPages);
     }
+
+    /**
+     * Returns this page with its items replaced and the paging numbers kept.
+     *
+     * @param replacements the new items, one for each current item
+     * @return the page
+     */
+    public <R> PageResponse<R> withItems(List<R> replacements) {
+        return new PageResponse<>(List.copyOf(replacements), page, size, totalItems, totalPages);
+    }
 }

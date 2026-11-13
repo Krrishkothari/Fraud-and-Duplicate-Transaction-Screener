@@ -111,7 +111,9 @@ class LiveTransactionControllerTest {
         mockMvc.perform(get("/api/runs/" + runId))
                 .andExpect(jsonPath("$.threshold.valuePaise").value(thresholdPaise));
         mockMvc.perform(get("/api/runs/" + runId + "/flags").param("type", "HIGH_AMOUNT").param("size", "200"))
-                .andExpect(jsonPath("$.items[*].transactionId", hasItems("LIVE-HIGH-1")));
+                .andExpect(jsonPath("$.items[*].transactionId", hasItems("LIVE-HIGH-1")))
+                .andExpect(jsonPath("$.items[?(@.transactionId == 'LIVE-HIGH-1')].accountId",
+                        hasItems("ACC_LIVE_1")));
     }
 
     // Proves a blacklisted account is caught through the Bloom filter and its exact store.
