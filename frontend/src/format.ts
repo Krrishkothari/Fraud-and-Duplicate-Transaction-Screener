@@ -52,22 +52,88 @@ const kolkataParts = new Intl.DateTimeFormat('en-GB', {
   year: 'numeric',
   hour: '2-digit',
   minute: '2-digit',
+  second: '2-digit',
   hourCycle: 'h23',
 })
 
-/** An instant in Asia/Kolkata time, such as 14 Mar 2026, 09:26 or 04 Sep 2026, 08:36. */
-export function formatDateTime(date: Date): string {
+interface KolkataParts {
+  year: string
+  /** Two digits, such as 03. */
+  month: string
+  /** Short English name, such as Mar. */
+  monthName: string
+  day: string
+  hour: string
+  minute: string
+  second: string
+}
+
+function partsInKolkata(date: Date): KolkataParts {
   const parts: Record<string, string> = {}
   for (const part of kolkataParts.formatToParts(date)) {
     parts[part.type] = part.value
   }
-  const month = MONTHS[Number(parts.month) - 1]
-  return `${parts.day} ${month} ${parts.year}, ${parts.hour}:${parts.minute}`
+  return {
+    year: parts.year,
+    month: parts.month.padStart(2, '0'),
+    monthName: MONTHS[Number(parts.month) - 1],
+    day: parts.day,
+    hour: parts.hour,
+    minute: parts.minute,
+    second: parts.second,
+  }
+}
+
+/** An instant in Asia/Kolkata time, such as 14 Mar 2026, 09:26 or 04 Sep 2026, 08:36. */
+export function formatDateTime(date: Date): string {
+  const p = partsInKolkata(date)
+  return `${p.day} ${p.monthName} ${p.year}, ${p.hour}:${p.minute}`
 }
 
 /** Epoch seconds in Asia/Kolkata time, as formatDateTime shows them. */
 export function formatEpochSeconds(epochSeconds: number): string {
   return formatDateTime(new Date(epochSeconds * 1000))
+}
+
+const DAY_SECONDS = 86_400
+
+/**
+ * Epoch seconds in Asia/Kolkata time as a short chart tick, detailed enough for a chart covering
+ * spanSeconds: 09:26 within a day, 14 Mar, 09:26 within a week, and 14 Mar beyond that.
+ */
+export function formatAxisTime(
+  epochSeconds: number,
+  spanSeconds: number,
+): string {
+  const p = partsInKolkata(new Date(epochSeconds * 1000))
+  if (spanSeconds <= DAY_SECONDS) {
+    return `${p.hour}:${p.minute}`
+  }
+  if (spanSeconds <= 7 * DAY_SECONDS) {
+    return `${p.day} ${p.monthName}, ${p.hour}:${p.minute}`
+  }
+  return `${p.day} ${p.monthName}`
+}
+
+/** Epoch seconds as a datetime-local input value in Asia/Kolkata time, such as 2026-03-14T09:26:05. */
+export function formatKolkataInput(epochSeconds: number): string {
+  const p = partsInKolkata(new Date(epochSeconds * 1000))
+  return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}`
+}
+
+const compact = new Intl.NumberFormat('en-IN', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
+
+/** A number in short Indian form for chart axes, such as 1250000 shown as 12.5L. */
+export function formatCompact(value: number): string {
+  return compact.format(value)
+}
+
+/** A duration in whole microseconds, such as 1534 shown as 1,534 µs. */
+export function formatMicros(micros: number): string {
+  return `${integer.format(micros)} µs`
 }
 
 const millis = new Intl.NumberFormat('en-IN', {

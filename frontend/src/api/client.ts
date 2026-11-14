@@ -9,6 +9,8 @@ import type {
   RunConfigInput,
   RunSummary,
   SampleRunRequest,
+  SeriesResponse,
+  WindowResult,
 } from './types'
 
 // Empty means same origin: in development the Vite proxy forwards /api to the backend.
@@ -227,6 +229,44 @@ export function getRejected(
   })
   return request<PageResponse<RejectedRow>>(
     `/api/runs/${encodeURIComponent(id)}/rejected?${params}`,
+    {},
+    { signal },
+  )
+}
+
+/**
+ * GET /api/runs/{id}/window: the sum, count and largest amount for one window. Each bound is an ISO-8601
+ * timestamp with offset or whole epoch seconds.
+ */
+export function getWindow(
+  id: string,
+  from: string,
+  to: string,
+  signal?: AbortSignal,
+): Promise<WindowResult> {
+  const params = new URLSearchParams({ from, to })
+  return request<WindowResult>(
+    `/api/runs/${encodeURIComponent(id)}/window?${params}`,
+    {},
+    { signal },
+  )
+}
+
+/** GET /api/runs/{id}/series: the range from one epoch second to another, split into consecutive windows. */
+export function getSeries(
+  id: string,
+  from: number,
+  to: number,
+  points: number,
+  signal?: AbortSignal,
+): Promise<SeriesResponse> {
+  const params = new URLSearchParams({
+    from: String(from),
+    to: String(to),
+    points: String(points),
+  })
+  return request<SeriesResponse>(
+    `/api/runs/${encodeURIComponent(id)}/series?${params}`,
     {},
     { signal },
   )

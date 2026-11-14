@@ -557,3 +557,146 @@
   margin: 0;
   font-size: var(--text-md);
 }
+
+/* Charts: Recharts draws the marks, these style the HTML around them */
+.charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+@media (max-width: 960px) {
+  .charts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+}
+
+.chart-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  color: var(--gray-700);
+  font-size: var(--text-sm);
+  list-style: none;
+}
+
+.chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.chart-legend-mark {
+  display: inline-block;
+  flex: none;
+}
+
+.chart-legend-bar {
+  width: 10px;
+  height: 10px;
+  background: currentcolor;
+  border-radius: 2px;
+}
+
+.chart-legend-line,
+.chart-legend-dashed {
+  width: 16px;
+  border-top: 2px solid currentcolor;
+}
+
+.chart-legend-dashed {
+  border-top-style: dashed;
+}
+
+.chart-legend-dot {
+  width: 8px;
+  height: 8px;
+  background: currentcolor;
+  border-radius: 50%;
+}
+
+.chart-axis-units {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--gray-600);
+  font-size: 0.75rem;
+}
+
+.chart-axis-x {
+  color: var(--gray-600);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.chart-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 280px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--text-sm);
+}
+
+.chart-tooltip-title {
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.chart-tooltip-values {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.chart-tooltip-values div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.chart-tooltip-values dt {
+  color: var(--gray-600);
+}
+
+.chart-tooltip-values dd {
+  margin: 0;
+}
+
+.chart-tooltip-flag {
+  color: var(--danger);
+  font-weight: 500;
+}
+
+/* Window query form */
+.window-query {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--gray-200);
+}
+
+.window-query-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
