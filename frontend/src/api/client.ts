@@ -10,6 +10,7 @@ import type {
   RunSummary,
   SampleRunRequest,
   SeriesResponse,
+  ThresholdResponse,
   WindowResult,
 } from './types'
 
@@ -267,6 +268,28 @@ export function getSeries(
   })
   return request<SeriesResponse>(
     `/api/runs/${encodeURIComponent(id)}/series?${params}`,
+    {},
+    { signal },
+  )
+}
+
+/**
+ * GET /api/runs/{id}/threshold: the p-th percentile amount, found by Quickselect on the server, over the whole
+ * run or over one window given in epoch seconds.
+ */
+export function getThreshold(
+  id: string,
+  p: number,
+  window: { from: number; to: number } | null,
+  signal?: AbortSignal,
+): Promise<ThresholdResponse> {
+  const params = new URLSearchParams({ p: String(p) })
+  if (window) {
+    params.set('from', String(window.from))
+    params.set('to', String(window.to))
+  }
+  return request<ThresholdResponse>(
+    `/api/runs/${encodeURIComponent(id)}/threshold?${params}`,
     {},
     { signal },
   )
