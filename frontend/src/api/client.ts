@@ -1,5 +1,7 @@
 import type {
   ApiErrorBody,
+  AppendRequest,
+  AppendResponse,
   BloomPlan,
   FieldViolation,
   FlaggedTransaction,
@@ -292,6 +294,24 @@ export function getThreshold(
     `/api/runs/${encodeURIComponent(id)}/threshold?${params}`,
     {},
     { signal },
+  )
+}
+
+/**
+ * POST /api/runs/{id}/transactions: adds one live transaction, which the server validates, screens and
+ * applies to the run's segment tree as a point update.
+ */
+export function appendTransaction(
+  id: string,
+  transaction: AppendRequest,
+): Promise<AppendResponse> {
+  return request<AppendResponse>(
+    `/api/runs/${encodeURIComponent(id)}/transactions`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(transaction),
+    },
   )
 }
 

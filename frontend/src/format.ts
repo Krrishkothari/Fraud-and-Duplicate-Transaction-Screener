@@ -121,6 +121,25 @@ export function formatKolkataInput(epochSeconds: number): string {
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}`
 }
 
+// India has one fixed offset and no daylight saving time.
+const IST_OFFSET = '+05:30'
+
+/**
+ * A datetime-local value, read as Asia/Kolkata time, as the ISO-8601 timestamp with offset the API expects,
+ * such as 2026-03-14T09:26 sent as 2026-03-14T09:26:00+05:30.
+ */
+export function kolkataInputToIso(value: string): string {
+  const withSeconds =
+    value.length === 'YYYY-MM-DDTHH:mm'.length ? `${value}:00` : value
+  return withSeconds + IST_OFFSET
+}
+
+/** Paise as the plain rupee text the API parses, with no grouping, such as 1234550 shown as 12345.50. */
+export function formatAmountInput(paise: number): string {
+  const remainder = String(paise % 100).padStart(2, '0')
+  return `${Math.floor(paise / 100)}.${remainder}`
+}
+
 const compact = new Intl.NumberFormat('en-IN', {
   notation: 'compact',
   maximumFractionDigits: 1,

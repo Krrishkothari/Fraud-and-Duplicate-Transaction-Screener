@@ -109,10 +109,13 @@ interface RunResultsProps {
 }
 
 function RunResults({ run, refresh }: RunResultsProps) {
-  const [selectedWindow, setSelectedWindow] = useState<TimeWindow>({
-    from: run.dataStart,
-    to: run.dataEnd,
-  })
+  // Until a panel chooses a window, the selection follows the data range, so it grows with live appends.
+  const [chosenWindow, setSelectedWindow] = useState<TimeWindow | null>(null)
+  const { dataStart, dataEnd } = run
+  const selectedWindow = useMemo<TimeWindow>(
+    () => chosenWindow ?? { from: dataStart, to: dataEnd },
+    [chosenWindow, dataStart, dataEnd],
+  )
   const context = useMemo<RunContextValue>(
     () => ({ run, refresh, selectedWindow, setSelectedWindow }),
     [run, refresh, selectedWindow],

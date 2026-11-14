@@ -8,14 +8,12 @@ import {
   formatKolkataInput,
   formatMicros,
   formatRupees,
+  kolkataInputToIso,
 } from '../../format'
 import { useRun } from '../../run/RunContext'
 import Alert from '../Alert'
 import Button from '../Button'
 import Field from '../Field'
-
-// India has one fixed offset and no daylight saving time.
-const IST_OFFSET = '+05:30'
 
 type QueryState =
   | { status: 'idle' }
@@ -26,13 +24,6 @@ type QueryState =
 interface FieldErrors {
   from?: string
   to?: string
-}
-
-/** A datetime-local value, read as IST, as the ISO-8601 timestamp with offset the API expects. */
-function kolkataInputToIso(value: string): string {
-  const withSeconds =
-    value.length === 'YYYY-MM-DDTHH:mm'.length ? `${value}:00` : value
-  return withSeconds + IST_OFFSET
 }
 
 /**

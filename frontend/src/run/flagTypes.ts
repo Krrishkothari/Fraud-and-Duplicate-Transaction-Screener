@@ -11,3 +11,9 @@ export const FLAG_LABELS: Record<FlagType, string> = {
   DUPLICATE: 'Duplicate',
   HIGH_AMOUNT: 'High amount',
 }
+
+export const FLAG_TONES: Record<FlagType, 'danger' | 'warning' | 'info'> = {
+  BLACKLISTED: 'danger',
+  DUPLICATE: 'warning',
+  HIGH_AMOUNT: 'info',
+}

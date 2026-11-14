@@ -3,7 +3,7 @@ import { getFlags } from '../../api/client'
 import type { FlagType } from '../../api/types'
 import { formatEpochSeconds, formatInteger, formatRupees } from '../../format'
 import { useRun } from '../../run/RunContext'
-import { FLAG_LABELS, FLAG_TYPES } from '../../run/flagTypes'
+import { FLAG_LABELS, FLAG_TONES, FLAG_TYPES } from '../../run/flagTypes'
 import { usePage } from '../../run/usePage'
 import Alert from '../Alert'
 import Badge from '../Badge'
@@ -17,12 +17,6 @@ import Table from '../Table'
 const PAGE_SIZE = 50
 
 type Filter = 'ALL' | FlagType
-
-const FLAG_TONES: Record<FlagType, 'danger' | 'warning' | 'info'> = {
-  BLACKLISTED: 'danger',
-  DUPLICATE: 'warning',
-  HIGH_AMOUNT: 'info',
-}
 
 const EMPTY_STATES: Record<Filter, { title: string; body: string }> = {
   ALL: {

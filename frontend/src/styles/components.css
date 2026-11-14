@@ -738,3 +738,34 @@
 .checkbox-field label:has(input:disabled) {
   color: var(--gray-600);
 }
+
+/* Live transaction result */
+.append-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--gray-200);
+}
+
+.append-result-title {
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.append-flags {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  font-size: var(--text-sm);
+  list-style: none;
+}
+
+.append-flags li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
