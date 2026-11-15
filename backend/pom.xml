@@ -53,6 +53,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- Runs the benchmarks: ./mvnw -q compile exec:java -Dexec.args="..." -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <mainClass>com.txnscreen.bench.BenchmarkRunner</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
