@@ -33,7 +33,7 @@ import tools.jackson.databind.json.JsonMapper;
 public final class BenchmarkRunner {
 
     /** The benchmarks the runner measures, in the order they appear in the results. */
-    static final List<Benchmark> BENCHMARKS = List.of();
+    static final List<Benchmark> BENCHMARKS = List.of(new BloomBench());
 
     private static final Set<String> OPTIONS =
             Set.of("--sizes", "--repeats", "--warmup", "--seed", "--machine", "--commit", "--out");

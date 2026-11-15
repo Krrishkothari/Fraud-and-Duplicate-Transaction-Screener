@@ -34,6 +34,12 @@
             <artifactId>commons-csv</artifactId>
             <version>1.14.1</version>
         </dependency>
+        <!-- Measures object graph sizes in the benchmarks, never used by the screening code. -->
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-core</artifactId>
+            <version>0.17</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
