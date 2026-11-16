@@ -26,3 +26,6 @@ data/generated/
 
 # macOS
 .DS_Store
+
+# Copy of docs/benchmarks/results.json, made by frontend/scripts/copy-benchmarks.mjs
+frontend/src/data/

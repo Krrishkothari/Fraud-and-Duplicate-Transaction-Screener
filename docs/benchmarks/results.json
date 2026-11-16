@@ -1,0 +1,1070 @@
+{
+  "environment" : {
+    "javaVersion" : "25.0.4.1",
+    "javaVmName" : "OpenJDK 64-Bit Server VM",
+    "osName" : "Windows 11",
+    "osArch" : "amd64",
+    "availableProcessors" : 20,
+    "maxMemory" : 3221225472,
+    "machine" : "Intel Core i7-13650HX (14 cores, 20 threads), 24 GB RAM, Lenovo 83DV laptop on AC power",
+    "commit" : "a6c6ba6",
+    "timestamp" : "2026-11-16T16:30:24.948087400Z"
+  },
+  "settings" : {
+    "sizes" : [ 10000, 100000, 1000000 ],
+    "repeats" : 7,
+    "warmup" : 3,
+    "seed" : 42
+  },
+  "measurements" : [ {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "bits",
+    "unit" : "bits",
+    "median" : 95851.0,
+    "min" : 95851.0,
+    "max" : 95851.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "hashes",
+    "unit" : "count",
+    "median" : 7.0,
+    "min" : 7.0,
+    "max" : 7.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "memory",
+    "unit" : "bytes",
+    "median" : 12048.0,
+    "min" : 12048.0,
+    "max" : 12048.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "insertTime",
+    "unit" : "ms",
+    "median" : 1.9107,
+    "min" : 1.4328,
+    "max" : 2.5201,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "queryTimePresent",
+    "unit" : "ns/query",
+    "median" : 219.48,
+    "min" : 146.73,
+    "max" : 248.81,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "queryTimeAbsent",
+    "unit" : "ns/query",
+    "median" : 160.29,
+    "min" : 140.42,
+    "max" : 239.13,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "measuredFpr",
+    "unit" : "fraction",
+    "median" : 0.01,
+    "min" : 0.01,
+    "max" : 0.01,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "theoreticalFpr",
+    "unit" : "fraction",
+    "median" : 0.010039010484203732,
+    "min" : 0.010039010484203732,
+    "max" : 0.010039010484203732,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 10000,
+    "metric" : "falseNegatives",
+    "unit" : "count",
+    "median" : 0.0,
+    "min" : 0.0,
+    "max" : 0.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 10000,
+    "metric" : "memoryIncludingKeys",
+    "unit" : "bytes",
+    "median" : 945648.0,
+    "min" : 945648.0,
+    "max" : 945648.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 10000,
+    "metric" : "memoryExcludingKeys",
+    "unit" : "bytes",
+    "median" : 385648.0,
+    "min" : 385648.0,
+    "max" : 385648.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 10000,
+    "metric" : "insertTime",
+    "unit" : "ms",
+    "median" : 0.819,
+    "min" : 0.3659,
+    "max" : 0.9385,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 10000,
+    "metric" : "queryTimePresent",
+    "unit" : "ns/query",
+    "median" : 133.08,
+    "min" : 71.81,
+    "max" : 194.15,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 10000,
+    "metric" : "queryTimeAbsent",
+    "unit" : "ns/query",
+    "median" : 33.39,
+    "min" : 29.39,
+    "max" : 40.92,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "bits",
+    "unit" : "bits",
+    "median" : 958506.0,
+    "min" : 958506.0,
+    "max" : 958506.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "hashes",
+    "unit" : "count",
+    "median" : 7.0,
+    "min" : 7.0,
+    "max" : 7.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "memory",
+    "unit" : "bytes",
+    "median" : 119880.0,
+    "min" : 119880.0,
+    "max" : 119880.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "insertTime",
+    "unit" : "ms",
+    "median" : 15.6593,
+    "min" : 15.1555,
+    "max" : 28.6975,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "queryTimePresent",
+    "unit" : "ns/query",
+    "median" : 154.982,
+    "min" : 145.646,
+    "max" : 201.985,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "queryTimeAbsent",
+    "unit" : "ns/query",
+    "median" : 137.584,
+    "min" : 118.65,
+    "max" : 182.305,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "measuredFpr",
+    "unit" : "fraction",
+    "median" : 0.01012,
+    "min" : 0.01012,
+    "max" : 0.01012,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "theoreticalFpr",
+    "unit" : "fraction",
+    "median" : 0.010039209581758123,
+    "min" : 0.010039209581758123,
+    "max" : 0.010039209581758123,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 100000,
+    "metric" : "falseNegatives",
+    "unit" : "count",
+    "median" : 0.0,
+    "min" : 0.0,
+    "max" : 0.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 100000,
+    "metric" : "memoryIncludingKeys",
+    "unit" : "bytes",
+    "median" : 9848688.0,
+    "min" : 9848688.0,
+    "max" : 9848688.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 100000,
+    "metric" : "memoryExcludingKeys",
+    "unit" : "bytes",
+    "median" : 4248688.0,
+    "min" : 4248688.0,
+    "max" : 4248688.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 100000,
+    "metric" : "insertTime",
+    "unit" : "ms",
+    "median" : 4.8343,
+    "min" : 4.5783,
+    "max" : 5.4989,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 100000,
+    "metric" : "queryTimePresent",
+    "unit" : "ns/query",
+    "median" : 148.478,
+    "min" : 134.846,
+    "max" : 171.942,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 100000,
+    "metric" : "queryTimeAbsent",
+    "unit" : "ns/query",
+    "median" : 31.213,
+    "min" : 27.852,
+    "max" : 40.099,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "bits",
+    "unit" : "bits",
+    "median" : 9585059.0,
+    "min" : 9585059.0,
+    "max" : 9585059.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "hashes",
+    "unit" : "count",
+    "median" : 7.0,
+    "min" : 7.0,
+    "max" : 7.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "memory",
+    "unit" : "bytes",
+    "median" : 1198200.0,
+    "min" : 1198200.0,
+    "max" : 1198200.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "insertTime",
+    "unit" : "ms",
+    "median" : 300.2371,
+    "min" : 272.689,
+    "max" : 319.5211,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "queryTimePresent",
+    "unit" : "ns/query",
+    "median" : 207.5555,
+    "min" : 198.4837,
+    "max" : 227.5291,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "queryTimeAbsent",
+    "unit" : "ns/query",
+    "median" : 149.9697,
+    "min" : 136.1224,
+    "max" : 154.2643,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "measuredFpr",
+    "unit" : "fraction",
+    "median" : 0.00999,
+    "min" : 0.00999,
+    "max" : 0.00999,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "theoreticalFpr",
+    "unit" : "fraction",
+    "median" : 0.010039214559253868,
+    "min" : 0.010039214559253868,
+    "max" : 0.010039214559253868,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "bloom",
+    "size" : 1000000,
+    "metric" : "falseNegatives",
+    "unit" : "count",
+    "median" : 0.0,
+    "min" : 0.0,
+    "max" : 0.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 1000000,
+    "metric" : "memoryIncludingKeys",
+    "unit" : "bytes",
+    "median" : 9.638872E7,
+    "min" : 9.638872E7,
+    "max" : 9.638872E7,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 1000000,
+    "metric" : "memoryExcludingKeys",
+    "unit" : "bytes",
+    "median" : 4.038872E7,
+    "min" : 4.038872E7,
+    "max" : 4.038872E7,
+    "repeats" : 1
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 1000000,
+    "metric" : "insertTime",
+    "unit" : "ms",
+    "median" : 148.1858,
+    "min" : 130.5072,
+    "max" : 435.9787,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 1000000,
+    "metric" : "queryTimePresent",
+    "unit" : "ns/query",
+    "median" : 307.4266,
+    "min" : 279.4253,
+    "max" : 314.2428,
+    "repeats" : 7
+  }, {
+    "benchmark" : "membership",
+    "variant" : "hashset",
+    "size" : 1000000,
+    "metric" : "queryTimeAbsent",
+    "unit" : "ns/query",
+    "median" : 33.222,
+    "min" : 32.5,
+    "max" : 64.3917,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 10000,
+    "metric" : "bucketCount",
+    "unit" : "count",
+    "median" : 43138.0,
+    "min" : 43138.0,
+    "max" : 43138.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 10000,
+    "metric" : "buildTime",
+    "unit" : "ms",
+    "median" : 0.7204,
+    "min" : 0.6423,
+    "max" : 1.4796,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 10000,
+    "metric" : "queryTime",
+    "unit" : "us/query",
+    "median" : 0.3101,
+    "min" : 0.2695,
+    "max" : 0.3248,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 10000,
+    "metric" : "updateTime",
+    "unit" : "ns/update",
+    "median" : 121.57,
+    "min" : 99.42,
+    "max" : 146.24,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 10000,
+    "metric" : "mismatchedWindows",
+    "unit" : "count",
+    "median" : 0.0,
+    "min" : 0.0,
+    "max" : 0.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "range",
+    "variant" : "linearscan",
+    "size" : 10000,
+    "metric" : "queryTime",
+    "unit" : "us/query",
+    "median" : 5.4096,
+    "min" : 5.3444,
+    "max" : 6.5145,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 100000,
+    "metric" : "bucketCount",
+    "unit" : "count",
+    "median" : 43196.0,
+    "min" : 43196.0,
+    "max" : 43196.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 100000,
+    "metric" : "buildTime",
+    "unit" : "ms",
+    "median" : 3.1349,
+    "min" : 2.5198,
+    "max" : 3.7003,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 100000,
+    "metric" : "queryTime",
+    "unit" : "us/query",
+    "median" : 0.3402,
+    "min" : 0.3228,
+    "max" : 0.378,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 100000,
+    "metric" : "updateTime",
+    "unit" : "ns/update",
+    "median" : 192.19,
+    "min" : 184.86,
+    "max" : 211.93,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 100000,
+    "metric" : "mismatchedWindows",
+    "unit" : "count",
+    "median" : 0.0,
+    "min" : 0.0,
+    "max" : 0.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "range",
+    "variant" : "linearscan",
+    "size" : 100000,
+    "metric" : "queryTime",
+    "unit" : "us/query",
+    "median" : 226.3171,
+    "min" : 215.532,
+    "max" : 240.7592,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 1000000,
+    "metric" : "bucketCount",
+    "unit" : "count",
+    "median" : 43200.0,
+    "min" : 43200.0,
+    "max" : 43200.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 1000000,
+    "metric" : "buildTime",
+    "unit" : "ms",
+    "median" : 42.2908,
+    "min" : 39.5737,
+    "max" : 44.0477,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 1000000,
+    "metric" : "queryTime",
+    "unit" : "us/query",
+    "median" : 0.4981,
+    "min" : 0.4808,
+    "max" : 0.5129,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 1000000,
+    "metric" : "updateTime",
+    "unit" : "ns/update",
+    "median" : 281.49,
+    "min" : 268.43,
+    "max" : 395.76,
+    "repeats" : 7
+  }, {
+    "benchmark" : "range",
+    "variant" : "segtree",
+    "size" : 1000000,
+    "metric" : "mismatchedWindows",
+    "unit" : "count",
+    "median" : 0.0,
+    "min" : 0.0,
+    "max" : 0.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "range",
+    "variant" : "linearscan",
+    "size" : 1000000,
+    "metric" : "queryTime",
+    "unit" : "us/query",
+    "median" : 2390.6988,
+    "min" : 2177.669,
+    "max" : 2449.3068,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "timeP95",
+    "unit" : "ms",
+    "median" : 0.3172,
+    "min" : 0.3095,
+    "max" : 0.4321,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "comparisonsP95",
+    "unit" : "count",
+    "median" : 33516.0,
+    "min" : 16384.0,
+    "max" : 72377.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "comparisonsPerNP95",
+    "unit" : "ratio",
+    "median" : 3.3516,
+    "min" : 1.6384,
+    "max" : 7.2377,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "valueP95",
+    "unit" : "paise",
+    "median" : 2445214.0,
+    "min" : 2445214.0,
+    "max" : 2445214.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 10000,
+    "metric" : "timeP95",
+    "unit" : "ms",
+    "median" : 1.4094,
+    "min" : 1.3787,
+    "max" : 2.1307,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "timeP99",
+    "unit" : "ms",
+    "median" : 0.2377,
+    "min" : 0.2299,
+    "max" : 0.3802,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "comparisonsP99",
+    "unit" : "count",
+    "median" : 28913.0,
+    "min" : 10995.0,
+    "max" : 68035.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "comparisonsPerNP99",
+    "unit" : "ratio",
+    "median" : 2.8913,
+    "min" : 1.0995,
+    "max" : 6.8035,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "valueP99",
+    "unit" : "paise",
+    "median" : 5050395.0,
+    "min" : 5050395.0,
+    "max" : 5050395.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 10000,
+    "metric" : "timeP99",
+    "unit" : "ms",
+    "median" : 1.5948,
+    "min" : 1.2609,
+    "max" : 2.051,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "timeAllEqualP99",
+    "unit" : "ms",
+    "median" : 0.0689,
+    "min" : 0.063,
+    "max" : 0.0812,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "comparisonsAllEqualP99",
+    "unit" : "count",
+    "median" : 20000.0,
+    "min" : 20000.0,
+    "max" : 20000.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "comparisonsPerNAllEqualP99",
+    "unit" : "ratio",
+    "median" : 2.0,
+    "min" : 2.0,
+    "max" : 2.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 10000,
+    "metric" : "valueAllEqualP99",
+    "unit" : "paise",
+    "median" : 50000.0,
+    "min" : 50000.0,
+    "max" : 50000.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 10000,
+    "metric" : "timeAllEqualP99",
+    "unit" : "ms",
+    "median" : 0.2042,
+    "min" : 0.2014,
+    "max" : 0.2631,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "timeP95",
+    "unit" : "ms",
+    "median" : 3.0117,
+    "min" : 2.9148,
+    "max" : 3.632,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "comparisonsP95",
+    "unit" : "count",
+    "median" : 327829.0,
+    "min" : 161051.0,
+    "max" : 863747.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "comparisonsPerNP95",
+    "unit" : "ratio",
+    "median" : 3.27829,
+    "min" : 1.61051,
+    "max" : 8.63747,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "valueP95",
+    "unit" : "paise",
+    "median" : 2526664.0,
+    "min" : 2526664.0,
+    "max" : 2526664.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 100000,
+    "metric" : "timeP95",
+    "unit" : "ms",
+    "median" : 10.3991,
+    "min" : 10.1456,
+    "max" : 10.9163,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "timeP99",
+    "unit" : "ms",
+    "median" : 2.8391,
+    "min" : 2.7019,
+    "max" : 2.9119,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "comparisonsP99",
+    "unit" : "count",
+    "median" : 295003.0,
+    "min" : 137939.0,
+    "max" : 834611.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "comparisonsPerNP99",
+    "unit" : "ratio",
+    "median" : 2.95003,
+    "min" : 1.37939,
+    "max" : 8.34611,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "valueP99",
+    "unit" : "paise",
+    "median" : 5187408.0,
+    "min" : 5187408.0,
+    "max" : 5187408.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 100000,
+    "metric" : "timeP99",
+    "unit" : "ms",
+    "median" : 10.2225,
+    "min" : 8.129,
+    "max" : 10.6229,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "timeAllEqualP99",
+    "unit" : "ms",
+    "median" : 0.6292,
+    "min" : 0.6163,
+    "max" : 0.6686,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "comparisonsAllEqualP99",
+    "unit" : "count",
+    "median" : 200000.0,
+    "min" : 200000.0,
+    "max" : 200000.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "comparisonsPerNAllEqualP99",
+    "unit" : "ratio",
+    "median" : 2.0,
+    "min" : 2.0,
+    "max" : 2.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 100000,
+    "metric" : "valueAllEqualP99",
+    "unit" : "paise",
+    "median" : 50000.0,
+    "min" : 50000.0,
+    "max" : 50000.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 100000,
+    "metric" : "timeAllEqualP99",
+    "unit" : "ms",
+    "median" : 0.3186,
+    "min" : 0.2674,
+    "max" : 41.1002,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "timeP95",
+    "unit" : "ms",
+    "median" : 18.2942,
+    "min" : 17.4165,
+    "max" : 18.7381,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "comparisonsP95",
+    "unit" : "count",
+    "median" : 3091313.0,
+    "min" : 1286831.0,
+    "max" : 6197332.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "comparisonsPerNP95",
+    "unit" : "ratio",
+    "median" : 3.091313,
+    "min" : 1.286831,
+    "max" : 6.197332,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "valueP95",
+    "unit" : "paise",
+    "median" : 2527135.0,
+    "min" : 2527135.0,
+    "max" : 2527135.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 1000000,
+    "metric" : "timeP95",
+    "unit" : "ms",
+    "median" : 124.9191,
+    "min" : 121.2916,
+    "max" : 160.0505,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "timeP99",
+    "unit" : "ms",
+    "median" : 19.9412,
+    "min" : 19.3377,
+    "max" : 22.2938,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "comparisonsP99",
+    "unit" : "count",
+    "median" : 2962777.0,
+    "min" : 1168846.0,
+    "max" : 5782179.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "comparisonsPerNP99",
+    "unit" : "ratio",
+    "median" : 2.962777,
+    "min" : 1.168846,
+    "max" : 5.782179,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "valueP99",
+    "unit" : "paise",
+    "median" : 5123229.0,
+    "min" : 5123229.0,
+    "max" : 5123229.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 1000000,
+    "metric" : "timeP99",
+    "unit" : "ms",
+    "median" : 125.3417,
+    "min" : 124.6516,
+    "max" : 128.343,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "timeAllEqualP99",
+    "unit" : "ms",
+    "median" : 8.6129,
+    "min" : 8.4575,
+    "max" : 9.5283,
+    "repeats" : 7
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "comparisonsAllEqualP99",
+    "unit" : "count",
+    "median" : 2000000.0,
+    "min" : 2000000.0,
+    "max" : 2000000.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "comparisonsPerNAllEqualP99",
+    "unit" : "ratio",
+    "median" : 2.0,
+    "min" : 2.0,
+    "max" : 2.0,
+    "repeats" : 25
+  }, {
+    "benchmark" : "selection",
+    "variant" : "quickselect",
+    "size" : 1000000,
+    "metric" : "valueAllEqualP99",
+    "unit" : "paise",
+    "median" : 50000.0,
+    "min" : 50000.0,
+    "max" : 50000.0,
+    "repeats" : 1
+  }, {
+    "benchmark" : "selection",
+    "variant" : "sort",
+    "size" : 1000000,
+    "metric" : "timeAllEqualP99",
+    "unit" : "ms",
+    "median" : 5.7738,
+    "min" : 5.0509,
+    "max" : 6.3218,
+    "repeats" : 7
+  } ]
+}

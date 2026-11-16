@@ -769,3 +769,42 @@
   align-items: center;
   gap: var(--space-2);
 }
+
+/* Benchmarks page */
+.environment-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: var(--space-3) var(--space-5);
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+}
+
+.environment-strip dt {
+  color: var(--gray-600);
+  font-size: 0.75rem;
+}
+
+.environment-strip dd {
+  margin: 0;
+}
+
+.section-verdict {
+  max-width: 80ch;
+  color: var(--gray-700);
+}
+
+.table .metric-name {
+  position: static;
+  background: transparent;
+  color: var(--gray-900);
+  font-weight: 400;
+}
+
+/* Benchmark tables are short, so they show every row instead of scrolling */
+.metric-table .table-wrap {
+  max-height: none;
+}
