@@ -18,6 +18,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Converts every exception raised while handling a request into an {@link ApiError} response.
@@ -78,6 +81,13 @@ public class GlobalExceptionHandler {
                 .toList();
         return respond(HttpStatus.BAD_REQUEST, "INVALID_CONFIG", "The configuration is invalid.",
                 Map.of("fieldErrors", fieldErrors));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleUnknownPath(NoResourceFoundException ex, HttpServletRequest request) {
+        return respond(HttpStatus.NOT_FOUND, "NOT_FOUND",
+                "No endpoint exists at this path. Every endpoint is under /api.",
+                Map.of("path", request.getRequestURI()));
     }
 
     @ExceptionHandler(Exception.class)
