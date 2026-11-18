@@ -808,3 +808,9 @@
 .metric-table .table-wrap {
   max-height: none;
 }
+
+/* Hints and errors may hold long unbroken text, such as a CSV header, so let them wrap anywhere */
+.field-hint,
+.field-error {
+  overflow-wrap: anywhere;
+}

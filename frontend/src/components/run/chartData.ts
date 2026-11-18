@@ -1,6 +1,12 @@
 import type { XAxisProps, YAxisProps } from 'recharts'
 import type { SeriesPoint, ThresholdResult } from '../../api/types'
-import { formatAxisTime, formatCompact, formatRupees } from '../../format'
+import {
+  formatAxisTime,
+  formatCompact,
+  formatEpochSeconds,
+  formatInteger,
+  formatRupees,
+} from '../../format'
 
 /** A series window with its amounts also in rupees, the unit the chart axes show. */
 export interface ChartPoint extends SeriesPoint {
@@ -54,6 +60,24 @@ export const VALUE_AXIS_PROPS: YAxisProps = {
   axisLine: false,
   tickFormatter: (value: number) => formatCompact(value),
   width: 48,
+}
+
+/** What the volume chart shows, in words: its range and its busiest window. points is never empty. */
+export function volumeSummary(points: ChartPoint[]): string {
+  const busiest = points.reduce((a, b) => (b.count > a.count ? b : a))
+  return `${points.length} windows from ${formatEpochSeconds(points[0].from)} to ${formatEpochSeconds(points[points.length - 1].to)} IST. The busiest window starts ${formatEpochSeconds(busiest.from)} IST, with ${formatInteger(busiest.count)} transactions totalling ${formatRupees(busiest.sumPaise)} INR.`
+}
+
+/** What the largest amount chart shows, in words: windows above the threshold and the largest amount. */
+export function maxAmountSummary(
+  points: ChartPoint[],
+  threshold: ThresholdResult,
+): string {
+  const above = points.filter(
+    (point) => point.maxPaise > threshold.valuePaise,
+  ).length
+  const largest = points.reduce((a, b) => (b.maxPaise > a.maxPaise ? b : a))
+  return `${above} of ${points.length} windows have a largest amount above the ${thresholdLabel(threshold)} INR. The largest single amount, ${formatRupees(largest.maxPaise)} INR, is in the window starting ${formatEpochSeconds(largest.from)} IST.`
 }
 
 /** The threshold as the chart labels it, such as P99 threshold 18,450.00. */

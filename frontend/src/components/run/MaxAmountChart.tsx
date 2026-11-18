@@ -15,6 +15,7 @@ import {
   CHART_COLORS,
   CHART_HEIGHT,
   CHART_MARGIN,
+  maxAmountSummary,
   thresholdLabel,
   timeAxisProps,
   VALUE_AXIS_PROPS,
@@ -69,6 +70,7 @@ function MaxAmountChart({
       <figcaption className="chart-title">
         Largest single amount per window
       </figcaption>
+      <p className="visually-hidden">{maxAmountSummary(points, threshold)}</p>
       <ChartLegend
         items={[
           {

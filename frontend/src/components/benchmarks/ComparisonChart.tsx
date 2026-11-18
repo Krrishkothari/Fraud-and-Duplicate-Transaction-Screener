@@ -76,7 +76,7 @@ function ComparisonChart({
       </div>
       <p className="visually-hidden">{summary}.</p>
       <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-        <LineChart data={data} margin={CHART_MARGIN} aria-hidden="true">
+        <LineChart data={data} margin={CHART_MARGIN}>
           <CartesianGrid stroke={CHART_COLORS.grid} vertical={false} />
           <XAxis
             dataKey="size"

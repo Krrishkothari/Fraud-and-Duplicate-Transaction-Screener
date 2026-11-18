@@ -73,16 +73,19 @@ function RunView({ id }: { id: string }) {
       )
     case 'expired':
       return (
-        <EmptyState
-          title="This run has expired or does not exist."
-          action={
-            <Link className="button button-primary" to="/screen">
-              Start a new screening
-            </Link>
-          }
-        >
-          Runs are kept for 30 minutes.
-        </EmptyState>
+        <div className="page">
+          <h1>Screening run</h1>
+          <EmptyState
+            title="This run has expired or does not exist."
+            action={
+              <Link className="button button-primary" to="/screen">
+                Start a new screening
+              </Link>
+            }
+          >
+            Runs are kept for 30 minutes.
+          </EmptyState>
+        </div>
       )
     case 'failed':
       return (

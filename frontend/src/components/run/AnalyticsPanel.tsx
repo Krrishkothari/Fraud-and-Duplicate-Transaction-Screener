@@ -16,7 +16,11 @@ function AnalyticsPanel() {
   return (
     <Card title="Time window analytics">
       <div className="card-stack">
-        {error && <Alert tone="danger">{error.message}</Alert>}
+        {error && (
+          <Alert tone="danger" title={error.code}>
+            {error.message}
+          </Alert>
+        )}
         {!series && !error && (
           <div className="panel-loading">
             <Spinner label="Loading charts" />

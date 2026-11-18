@@ -212,7 +212,11 @@ function PrefillNote({ state }: { state: PrefillState }) {
         </p>
       )
     case 'failed':
-      return <Alert tone="danger">{state.error.message}</Alert>
+      return (
+        <Alert tone="danger" title={state.error.code}>
+          {state.error.message}
+        </Alert>
+      )
     default:
       return null
   }

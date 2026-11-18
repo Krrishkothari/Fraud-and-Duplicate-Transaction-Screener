@@ -16,6 +16,7 @@ import {
   CHART_MARGIN,
   timeAxisProps,
   VALUE_AXIS_PROPS,
+  volumeSummary,
 } from './chartData'
 import type { ChartPoint } from './chartData'
 
@@ -31,6 +32,7 @@ function VolumeChart({ points, spanSeconds }: VolumeChartProps) {
       <figcaption className="chart-title">
         Transactions and total amount per window
       </figcaption>
+      <p className="visually-hidden">{volumeSummary(points)}</p>
       <ChartLegend
         items={[
           { label: 'Transactions', color: CHART_COLORS.count, mark: 'bar' },

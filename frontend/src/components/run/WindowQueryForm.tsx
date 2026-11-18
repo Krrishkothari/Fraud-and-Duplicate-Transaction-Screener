@@ -115,7 +115,9 @@ function WindowQueryForm() {
         </div>
       </form>
       {state.status === 'failed' && (
-        <Alert tone="danger">{state.error.message}</Alert>
+        <Alert tone="danger" title={state.error.code}>
+          {state.error.message}
+        </Alert>
       )}
       {state.status === 'done' && <WindowTotals result={state.result} />}
     </section>
