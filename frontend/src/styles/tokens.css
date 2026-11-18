@@ -13,6 +13,7 @@
   /* Accent */
   --accent: #0f766e;
   --accent-hover: #0b5f59;
+  --accent-soft: #e7f1f0;
 
   /* Semantic colors, each with a soft tint for backgrounds */
   --danger: #b42318;
