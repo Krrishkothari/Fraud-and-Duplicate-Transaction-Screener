@@ -13,7 +13,7 @@ RUN useradd --system --uid 10001 --no-create-home txnscreen
 WORKDIR /app
 COPY --from=build /build/target/txnscreen-backend-*.jar app.jar
 USER txnscreen
-# Keep the heap inside the container's memory limit and use the collector
+# Keep the heap inside the container's memory (512 MB on Render's free plan) and use the collector
 # with the least overhead for one small instance.
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+UseSerialGC"
 EXPOSE 8080
