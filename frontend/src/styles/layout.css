@@ -104,6 +104,35 @@
   color: var(--gray-600);
 }
 
+/* Privacy policy and terms */
+.legal {
+  max-width: 70ch;
+}
+
+.legal-updated {
+  font-size: var(--text-sm);
+}
+
+.legal-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.legal-section h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.legal-section ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
 .page-loading {
   display: flex;
   justify-content: center;
