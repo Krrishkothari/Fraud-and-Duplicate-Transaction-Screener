@@ -46,10 +46,10 @@ function PrivacyPage() {
 
       <LegalSection title="Logs">
         <p>
-          The site is hosted by Vercel and the API by Render. Like most hosting
-          providers, they may keep standard request logs, such as your IP
-          address, the time of each request and the address requested. Their own
-          privacy policies cover those logs. When a request fails with an
+          The site and its API run on third-party hosting providers. Like most
+          hosting providers, they may keep standard request logs, such as your
+          IP address, the time of each request and the address requested. Their
+          own privacy policies cover those logs. When a request fails with an
           unexpected error, our server also writes a technical error report to
           its log so the bug can be fixed.
         </p>
