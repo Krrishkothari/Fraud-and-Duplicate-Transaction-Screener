@@ -253,7 +253,11 @@ the Benchmarks page draws its charts and tables from it.
 
 - [docs/api.md](docs/api.md): every endpoint, with a curl example and a real response
 - [docs/deployment.md](docs/deployment.md): deploying the API to Render and the frontend to Vercel
-- [docs/report/](docs/report/): technical report sections
+- [docs/report/TxnScreen_Technical_Report.pdf](docs/report/TxnScreen_Technical_Report.pdf): the technical
+  report, condensed from the full sections in [docs/report/](docs/report/)
+- [docs/demo-script.md](docs/demo-script.md): the 8-minute demo, with the values each step should show
+- [docs/launch-checklist.md](docs/launch-checklist.md): what has been checked before launch, and what is
+  still open
 - [docs/benchmarks/machine.md](docs/benchmarks/machine.md): how the benchmarks were run
 - [docs/proposal.docx](docs/proposal.docx): the project proposal
 
@@ -264,9 +268,11 @@ build plan's numbering, listed under whoever made the commit.
 
 | Name | Algorithm | Commits |
 | --- | --- | --- |
-| Krrish | Bloom filter and MurmurHash3 | K01 to K13, V13, plus five more: project info, the one-command `npm run dev`, transactions in flag pages, and two deployment configuration commits |
-| Hardik | Segment tree and time buckets | H01 to H11, H13, H14, K15, plus one more: a 404 response for unknown API paths |
+| Krrish | Bloom filter and MurmurHash3 | K01 to K13, V13, V15, plus five more: project info, the one-command `npm run dev`, transactions in flag pages, and two deployment configuration commits |
+| Hardik | Segment tree and time buckets | H01 to H11, H13 to H15, K15, plus one more: a 404 response for unknown API paths |
 | Vedant | Randomized Quickselect | V01 to V12, K14, V14 |
+
+Every commit, with its hash, is listed in [docs/report/08-contributions.md](docs/report/08-contributions.md).
 
 ## License
 
