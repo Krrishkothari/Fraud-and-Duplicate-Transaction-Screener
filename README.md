@@ -43,6 +43,40 @@ Technology.
 Each one has a section in the technical report under [docs/report/](docs/report/), and the app's Method page
 explains them in plain language.
 
+## Screenshots
+
+Captured from a local build with the API's real responses. The run pages use the generated 10,000-row sample
+with seed 42.
+
+**Home.** What the app does and which algorithm runs each step.
+
+![Home page](docs/screenshots/home.png)
+
+**Screen.** Generated sample data selected, with the screening settings and the live Bloom filter plan.
+
+![Screen page with sample data selected](docs/screenshots/screen.png)
+
+**Run.** The summary, both Bloom filters' statistics, the time-window charts and window query, the high amount
+threshold, the live transaction form, the flagged transactions and the rejected rows.
+
+![Run page for the 10,000-row sample](docs/screenshots/run.png)
+
+**Benchmarks.** Each algorithm against its baseline at 10,000, 100,000 and 1,000,000 rows, drawn from
+[docs/benchmarks/results.json](docs/benchmarks/results.json).
+
+![Benchmarks page](docs/screenshots/benchmarks.png)
+
+**Error state.** A transactions file with the wrong header is rejected with the API's `BAD_HEADER` error and
+its message.
+
+![Screen page showing a BAD_HEADER error](docs/screenshots/error-state.png)
+
+**Saturation warning.** The same sample with expected insertions set to 1,000. The duplicate ID filter holds
+9,812 IDs in 9,586 bits, so it reports that it is over capacity and suggests 94,049 bits. It still confirmed
+the same 188 duplicates as the default run, because every hit is checked against the exact store.
+
+![Bloom filter panel with the saturation warning on the duplicate ID filter](docs/screenshots/saturation-warning.png)
+
 ## Tech stack
 
 | Layer | Choice |
@@ -74,7 +108,7 @@ backend/            Spring Boot API, algorithms, tests, benchmarks, Dockerfile
     bench/          benchmark runner
 frontend/           React app
 data/samples/       committed sample files: 1K and 10K rows, blacklists, labels, edge cases
-docs/               API reference, deployment guide, report sections, benchmark results
+docs/               API reference, deployment guide, report sections, benchmark results, screenshots
 scripts/dev.mjs     starts the backend and frontend together
 render.yaml         Render blueprint for the API
 ```
