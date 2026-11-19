@@ -134,7 +134,9 @@ npm run dev
 
 This installs the frontend's dependencies if needed, then starts the API on http://localhost:8080 and the
 frontend on http://localhost:5173. Their output is shown with `backend` and `frontend` prefixes, and Ctrl+C
-stops both. The first start downloads the Maven dependencies, which takes a few minutes.
+or closing the terminal stops both. The first start downloads the Maven dependencies, which takes a few
+minutes. If a server from an earlier `npm run dev` is still holding one of the two ports, it is stopped
+first; if another program holds a port, the script names it and exits.
 
 Open http://localhost:5173, go to **Screen**, and either choose **Generate sample data** or upload
 `data/samples/transactions_1000.csv` with `data/samples/blacklist_1000.csv`.
