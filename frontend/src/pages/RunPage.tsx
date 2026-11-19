@@ -1,11 +1,16 @@
+import { Clock, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { ApiError, asApiError, getRun } from '../api/client'
 import type { RunSummary as RunSummaryData } from '../api/types'
-import Alert from '../components/Alert'
-import Button from '../components/Button'
+import { ErrorAlert } from '../components/Alert'
+import { ButtonLink } from '../components/Button'
+import Card from '../components/Card'
+import CopyButton from '../components/CopyButton'
 import EmptyState from '../components/EmptyState'
-import Spinner from '../components/Spinner'
+import PageHeader from '../components/PageHeader'
+import { Loading, Skeleton, TableSkeleton } from '../components/Skeleton'
+import Tabs from '../components/Tabs'
 import AnalyticsPanel from '../components/run/AnalyticsPanel'
 import BloomStatsPanel from '../components/run/BloomStatsPanel'
 import FlaggedTable from '../components/run/FlaggedTable'
@@ -13,7 +18,8 @@ import LiveTransactionPanel from '../components/run/LiveTransactionPanel'
 import RejectedRowsTable from '../components/run/RejectedRowsTable'
 import RunSummary from '../components/run/RunSummary'
 import ThresholdPanel from '../components/run/ThresholdPanel'
-import { formatDateTime } from '../format'
+import { formatDateTime, formatEpochSeconds, formatInteger } from '../format'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { RunContext } from '../run/RunContext'
 import type { RunContextValue, TimeWindow } from '../run/RunContext'
 
@@ -25,6 +31,7 @@ type LoadState =
 
 function RunPage() {
   const { id = '' } = useParams()
+  useDocumentTitle('Screening run')
   // A new key gives each run ID fresh state, so one run's results never show under another's URL.
   return <RunView key={id} id={id} />
 }
@@ -66,44 +73,59 @@ function RunView({ id }: { id: string }) {
 
   switch (state.status) {
     case 'loading':
-      return (
-        <div className="page-loading">
-          <Spinner label="Loading run" />
-        </div>
-      )
+      return <RunSkeleton />
     case 'expired':
       return (
-        <div className="page">
-          <h1>Screening run</h1>
-          <EmptyState
-            title="This run has expired or does not exist."
-            action={
-              <Link className="button button-primary" to="/screen">
-                Start a new screening
-              </Link>
-            }
-          >
-            Runs are kept for 30 minutes.
-          </EmptyState>
+        <div className="container page">
+          <PageHeader title="Screening run" />
+          <Card>
+            <EmptyState
+              icon={Clock}
+              title="This run has expired or does not exist."
+              action={
+                <ButtonLink to="/screen">Start a new screening</ButtonLink>
+              }
+            >
+              Runs are kept for 30 minutes.
+            </EmptyState>
+          </Card>
         </div>
       )
     case 'failed':
       return (
-        <div className="page">
-          <h1>Screening run</h1>
-          <Alert tone="danger" title={state.error.code}>
-            {state.error.message}
-          </Alert>
-          <div>
-            <Button variant="secondary" onClick={retry}>
-              Try again
-            </Button>
-          </div>
+        <div className="container page">
+          <PageHeader title="Screening run" />
+          <ErrorAlert error={state.error} onRetry={retry} />
         </div>
       )
     case 'loaded':
       return <RunResults run={state.run} refresh={refresh} />
   }
+}
+
+/** The page's shape while the run summary loads. */
+function RunSkeleton() {
+  return (
+    <div className="container page">
+      <PageHeader
+        title="Screening run"
+        meta={<Skeleton width={320} height={10} />}
+      />
+      <Loading label="Loading run">
+        <div className="stat-grid">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div key={index} className="stat-card">
+              <Skeleton width="48%" height={10} />
+              <Skeleton width="64%" height={24} />
+            </div>
+          ))}
+        </div>
+      </Loading>
+      <Card title="Flagged transactions" flush>
+        <TableSkeleton label="Loading flagged transactions" columns={7} />
+      </Card>
+    </div>
+  )
 }
 
 interface RunResultsProps {
@@ -126,21 +148,69 @@ function RunResults({ run, refresh }: RunResultsProps) {
 
   return (
     <RunContext value={context}>
-      <div className="page">
-        <header className="page-header">
-          <h1>Screening run</h1>
-          <p>
-            Run <span className="mono">{run.id}</span>, created{' '}
-            {formatDateTime(new Date(run.createdAt))} IST.
-          </p>
-        </header>
+      <div className="container page">
+        <PageHeader
+          title="Screening run"
+          meta={
+            <>
+              <span className="meta-item">
+                Run <code>{run.id}</code>
+                <CopyButton value={run.id} label="Copy run ID" />
+              </span>
+              <span className="meta-item">
+                Created {formatDateTime(new Date(run.createdAt))} IST
+              </span>
+              <span className="meta-item">
+                Data from{' '}
+                <span className="mono">
+                  {formatEpochSeconds(run.dataStart)}
+                </span>{' '}
+                to{' '}
+                <span className="mono">{formatEpochSeconds(run.dataEnd)}</span>{' '}
+                IST
+              </span>
+            </>
+          }
+          actions={
+            <ButtonLink to="/screen" variant="secondary">
+              <Plus aria-hidden="true" />
+              New screening
+            </ButtonLink>
+          }
+        />
         <RunSummary />
-        <BloomStatsPanel />
-        <AnalyticsPanel />
-        <ThresholdPanel />
-        <LiveTransactionPanel />
         <FlaggedTable />
-        <RejectedRowsTable />
+        <Tabs
+          label="Run details"
+          tabs={[
+            {
+              id: 'windows',
+              label: 'Time windows',
+              content: <AnalyticsPanel />,
+            },
+            {
+              id: 'threshold',
+              label: 'High amount threshold',
+              content: <ThresholdPanel />,
+            },
+            {
+              id: 'filters',
+              label: 'Bloom filters',
+              content: <BloomStatsPanel />,
+            },
+            {
+              id: 'live',
+              label: 'Live transactions',
+              content: <LiveTransactionPanel />,
+            },
+            {
+              id: 'rejected',
+              label: 'Rejected rows',
+              count: formatInteger(run.rejectedRows),
+              content: <RejectedRowsTable />,
+            },
+          ]}
+        />
       </div>
     </RunContext>
   )

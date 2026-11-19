@@ -22,24 +22,27 @@ export function toChartPoints(points: SeriesPoint[]): ChartPoint[] {
   }))
 }
 
-/** Chart colors, all taken from tokens.css. */
+/** Chart colors, all taken from tokens.css, so they follow the light and dark theme. */
 export const CHART_COLORS = {
-  count: 'var(--gray-400)',
-  amount: 'var(--accent)',
-  threshold: 'var(--gray-700)',
-  above: 'var(--danger)',
-  grid: 'var(--gray-200)',
-  axis: 'var(--gray-300)',
-  tick: 'var(--gray-600)',
-  cursor: 'var(--gray-100)',
-  surface: 'var(--white)',
+  primary: 'var(--chart-primary)',
+  baseline: 'var(--chart-baseline)',
+  count: 'var(--chart-bar)',
+  amount: 'var(--chart-primary)',
+  threshold: 'var(--color-text-secondary)',
+  above: 'var(--color-danger)',
+  grid: 'var(--chart-grid)',
+  axis: 'var(--chart-axis)',
+  tick: 'var(--chart-tick)',
+  cursor: 'var(--chart-cursor)',
+  surface: 'var(--color-surface)',
 }
 
 export const CHART_HEIGHT = 260
 
 export const CHART_MARGIN = { top: 8, right: 4, bottom: 0, left: 4 }
 
-const TICK = { fill: CHART_COLORS.tick, fontSize: 12 }
+/** Axis label text. Tabular figures for the ticks are set in components.css. */
+export const TICK = { fill: CHART_COLORS.tick, fontSize: 12 }
 
 /** The shared x axis: one category per window, labelled by its start in Asia/Kolkata time. */
 export function timeAxisProps(spanSeconds: number): XAxisProps {

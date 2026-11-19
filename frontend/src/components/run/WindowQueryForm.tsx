@@ -11,9 +11,10 @@ import {
   kolkataInputToIso,
 } from '../../format'
 import { useRun } from '../../run/RunContext'
-import Alert from '../Alert'
+import Alert, { ErrorAlert } from '../Alert'
 import Button from '../Button'
 import Field from '../Field'
+import { Input } from '../Input'
 
 type QueryState =
   | { status: 'idle' }
@@ -75,12 +76,21 @@ function WindowQueryForm() {
   const querying = state.status === 'querying'
 
   return (
-    <section className="window-query">
-      <h3 className="window-query-title">Query a window</h3>
-      <form className="card-stack" onSubmit={handleSubmit} noValidate>
-        <div className="form-grid">
+    <section className="window-query" aria-labelledby="window-query-title">
+      <div className="panel-heading">
+        <h3 id="window-query-title" className="panel-title">
+          Query a window
+        </h3>
+        <p className="panel-note">
+          Both ends are included. Totals cover every{' '}
+          {formatInteger(run.config.bucketSeconds)} second bucket the window
+          touches.
+        </p>
+      </div>
+      <form className="window-query-form" onSubmit={handleSubmit} noValidate>
+        <div className="window-query-fields">
           <Field label="From (IST)" error={fieldErrors.from}>
-            <input
+            <Input
               type="datetime-local"
               step={1}
               value={fromInput}
@@ -88,37 +98,28 @@ function WindowQueryForm() {
             />
           </Field>
           <Field label="To (IST)" error={fieldErrors.to}>
-            <input
+            <Input
               type="datetime-local"
               step={1}
               value={toInput}
               onChange={(event) => setToInput(event.target.value)}
             />
           </Field>
-        </div>
-        <p className="panel-note">
-          Both ends are included. Totals cover every{' '}
-          {formatInteger(run.config.bucketSeconds)} second bucket the window
-          touches.
-        </p>
-        <div className="form-actions">
-          <Button
-            variant="secondary"
-            onClick={showFullRange}
-            disabled={querying}
-          >
-            Full data range
-          </Button>
-          <Button type="submit" disabled={querying}>
-            {querying ? 'Querying' : 'Query window'}
-          </Button>
+          <div className="window-query-actions">
+            <Button
+              variant="secondary"
+              onClick={showFullRange}
+              disabled={querying}
+            >
+              Full data range
+            </Button>
+            <Button type="submit" loading={querying}>
+              {querying ? 'Querying' : 'Query window'}
+            </Button>
+          </div>
         </div>
       </form>
-      {state.status === 'failed' && (
-        <Alert tone="danger" title={state.error.code}>
-          {state.error.message}
-        </Alert>
-      )}
+      {state.status === 'failed' && <ErrorAlert error={state.error} />}
       {state.status === 'done' && <WindowTotals result={state.result} />}
     </section>
   )
@@ -127,14 +128,14 @@ function WindowQueryForm() {
 function WindowTotals({ result }: { result: WindowResult }) {
   const range = `${formatEpochSeconds(result.effectiveFrom)} to ${formatEpochSeconds(result.effectiveTo)} IST`
   return (
-    <div className="card-stack">
+    <div className="panel-stack">
       {result.clamped && (
         <Alert tone="info" title="Window narrowed to the data range">
           The window reached past the run&apos;s data, so the query used {range}
           .
         </Alert>
       )}
-      <dl className="summary-values">
+      <dl className="stat-inline">
         <div>
           <dt>Total amount (INR)</dt>
           <dd className="mono">{formatRupees(result.sumPaise)}</dd>
@@ -151,9 +152,9 @@ function WindowTotals({ result }: { result: WindowResult }) {
           <dt>Query time</dt>
           <dd className="mono">{formatMicros(result.algoMicros)}</dd>
         </div>
-        <div className="summary-wide">
+        <div className="stat-inline-wide">
           <dt>Window queried</dt>
-          <dd>{range}</dd>
+          <dd className="mono">{range}</dd>
         </div>
       </dl>
     </div>

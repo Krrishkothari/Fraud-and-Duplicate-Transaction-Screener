@@ -1,49 +1,117 @@
+/*
+ * Design tokens. Each color holds its light and dark value in light-dark(), which follows color-scheme:
+ * the system setting by default, or the theme chosen in the header, which sets data-theme on <html>.
+ */
 :root {
-  /* Neutral gray scale */
-  --gray-900: #0b0d10;
-  --gray-700: #3a4149;
-  --gray-600: #545c66;
-  --gray-400: #98a0aa;
-  --gray-300: #d0d5db;
-  --gray-200: #e4e7eb;
-  --gray-100: #eff1f4;
-  --gray-50: #f7f8fa;
-  --white: #ffffff;
+  color-scheme: light dark;
+}
 
-  /* Accent */
-  --accent: #0f766e;
-  --accent-hover: #0b5f59;
-  --accent-soft: #e7f1f0;
+:root[data-theme='light'] {
+  color-scheme: light;
+}
 
-  /* Semantic colors, each with a soft tint for backgrounds */
-  --danger: #b42318;
-  --danger-soft: #fef3f2;
-  --warning: #b54708;
-  --warning-soft: #fffaeb;
-  --success: #067647;
-  --success-soft: #ecfdf3;
-  --info: #175cd3;
-  --info-soft: #eff8ff;
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
 
-  /* Spacing */
+:root {
+  /* Neutrals */
+  --color-bg: light-dark(#fafafa, #0b0b0c);
+  --color-bg-translucent: light-dark(
+    rgb(250 250 250 / 80%),
+    rgb(11 11 12 / 78%)
+  );
+  --color-surface: light-dark(#ffffff, #131315);
+  --color-surface-subtle: light-dark(#f5f5f5, #1a1a1d);
+  --color-surface-hover: light-dark(#f4f4f4, #1d1d21);
+  --color-surface-raised: light-dark(#ffffff, #222226);
+  --color-skeleton: light-dark(#ededed, #232327);
+  --color-border: light-dark(#e5e5e5, #26262a);
+  --color-border-strong: light-dark(#d4d4d4, #38383e);
+  --color-border-hover: light-dark(#a3a3a3, #4b4b53);
+  --color-text: light-dark(#0a0a0a, #ededef);
+  --color-text-secondary: light-dark(#525252, #a3a3ab);
+  --color-text-muted: light-dark(#6b6b6b, #8a8a93);
+
+  /* Brand accent, used for primary actions, the active page, links and focus */
+  --color-accent: light-dark(#0f766e, #2dd4bf);
+  --color-accent-solid: light-dark(#0f766e, #14b8a6);
+  --color-accent-solid-hover: light-dark(#115e59, #2dd4bf);
+  --color-on-accent: light-dark(#ffffff, #04211f);
+  --color-accent-subtle: light-dark(#effaf8, rgb(45 212 191 / 10%));
+  --color-accent-border: light-dark(#a7e3da, rgb(45 212 191 / 32%));
+  --color-focus: light-dark(#0f766e, #2dd4bf);
+  --color-focus-ring: light-dark(rgb(15 118 110 / 20%), rgb(45 212 191 / 28%));
+
+  /* Meaning only: red for blacklisted and failures, amber for high amounts, blue for duplicates */
+  --color-danger: light-dark(#b91c1c, #f87171);
+  --color-danger-subtle: light-dark(#fef2f2, rgb(248 113 113 / 11%));
+  --color-danger-border: light-dark(#fecaca, rgb(248 113 113 / 30%));
+  --color-danger-ring: light-dark(rgb(185 28 28 / 16%), rgb(248 113 113 / 24%));
+  --color-warning: light-dark(#a14a06, #fbbf24);
+  --color-warning-subtle: light-dark(#fffbeb, rgb(251 191 36 / 10%));
+  --color-warning-border: light-dark(#fde68a, rgb(251 191 36 / 28%));
+  --color-info: light-dark(#1d4ed8, #93b4fd);
+  --color-info-subtle: light-dark(#eff6ff, rgb(96 165 250 / 11%));
+  --color-info-border: light-dark(#bfdbfe, rgb(96 165 250 / 30%));
+  --color-success: light-dark(#15803d, #4ade80);
+  --color-success-subtle: light-dark(#f0fdf4, rgb(74 222 128 / 10%));
+  --color-success-border: light-dark(#bbf7d0, rgb(74 222 128 / 28%));
+
+  /* Charts */
+  --chart-primary: var(--color-accent);
+  --chart-baseline: light-dark(#8f8f8f, #74747c);
+  --chart-bar: light-dark(#d9d9d9, #34343a);
+  --chart-grid: light-dark(#efefef, #222226);
+  --chart-axis: light-dark(#d4d4d4, #38383e);
+  --chart-tick: var(--color-text-muted);
+  --chart-cursor: light-dark(rgb(0 0 0 / 4%), rgb(255 255 255 / 5%));
+
+  /* Spacing, on an 8px grid with a 4px half step */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
   --space-6: 32px;
-  --space-7: 48px;
+  --space-7: 40px;
+  --space-8: 48px;
+  --space-9: 64px;
+  --space-10: 96px;
 
-  /* Shape and depth */
+  /* Shape and depth: one shadow level, always with a hairline border */
+  --radius-sm: 4px;
   --radius: 6px;
-  --shadow-sm: 0 1px 2px rgb(11 13 16 / 5%);
+  --radius-lg: 8px;
+  --shadow: 0 1px 2px light-dark(rgb(0 0 0 / 4%), rgb(0 0 0 / 36%));
 
   /* Type */
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.25rem;
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --text-hero: 48px;
+  --text-title: 30px;
+  --text-section: 20px;
+  --text-lg: 16px;
+  --text-body: 15px;
+  --text-sm: 13px;
+  --text-xs: 12px;
+  --text-mono-sm: 12.5px;
 
+  /* Layout */
   --content-width: 1200px;
+  --gutter: 24px;
+  --header-height: 56px;
+
+  /* Motion */
+  --duration: 160ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (max-width: 640px) {
+  :root {
+    --gutter: 16px;
+    --text-hero: 36px;
+    --text-title: 26px;
+  }
 }

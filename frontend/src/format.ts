@@ -1,8 +1,11 @@
 // Display formatting only. These never compute algorithm results.
 
-const integer = new Intl.NumberFormat('en-IN')
+// Standard digit grouping in threes, such as 100,000 and 1,000,000, everywhere numbers are shown.
+const LOCALE = 'en-US'
 
-/** A whole number with Indian digit grouping, such as 9,585,059 shown as 95,85,059. */
+const integer = new Intl.NumberFormat(LOCALE)
+
+/** A whole number with digit grouping, such as 9585059 shown as 9,585,059. */
 export function formatInteger(value: number): string {
   return integer.format(value)
 }
@@ -23,7 +26,7 @@ export function formatPercent(fraction: number, decimals = 3): string {
   return `${(fraction * 100).toFixed(decimals)}%`
 }
 
-/** A positive amount in paise as rupees with 2 decimals and Indian grouping, such as 1234567 shown as 12,345.67. */
+/** A positive amount in paise as rupees with 2 decimals and digit grouping, such as 1234567 shown as 12,345.67. */
 export function formatRupees(paise: number): string {
   const rupees = Math.floor(paise / 100)
   const remainder = String(paise % 100).padStart(2, '0')
@@ -140,12 +143,12 @@ export function formatAmountInput(paise: number): string {
   return `${Math.floor(paise / 100)}.${remainder}`
 }
 
-const compact = new Intl.NumberFormat('en-IN', {
+const compact = new Intl.NumberFormat(LOCALE, {
   notation: 'compact',
   maximumFractionDigits: 1,
 })
 
-/** A number in short Indian form for chart axes, such as 1250000 shown as 12.5L. */
+/** A number in short form for chart axes, such as 1250000 shown as 1.3M. */
 export function formatCompact(value: number): string {
   return compact.format(value)
 }
@@ -155,7 +158,7 @@ export function formatMicros(micros: number): string {
   return `${integer.format(micros)} µs`
 }
 
-const millis = new Intl.NumberFormat('en-IN', {
+const millis = new Intl.NumberFormat(LOCALE, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })
@@ -163,4 +166,23 @@ const millis = new Intl.NumberFormat('en-IN', {
 /** A duration in microseconds as milliseconds with 2 decimals, such as 1534 shown as 1.53 ms. */
 export function formatMillis(micros: number): string {
   return `${millis.format(micros / 1000)} ms`
+}
+
+const measured = [3, 2, 1].map(
+  (digits) =>
+    new Intl.NumberFormat(LOCALE, {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }),
+)
+
+/** A measured value with about 4 significant digits, such as 0.153, 5.01, 58.80 or 1,234.5. */
+export function formatMeasured(value: number): string {
+  if (value < 1) {
+    return measured[0].format(value)
+  }
+  if (value < 100) {
+    return measured[1].format(value)
+  }
+  return measured[2].format(value)
 }

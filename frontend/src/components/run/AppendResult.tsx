@@ -7,17 +7,17 @@ function AppendResult({ result }: { result: AppendResponse }) {
   const { transaction, flags, bucketStats } = result
   return (
     <section className="append-result" aria-live="polite">
-      <h3 className="append-result-title">
+      <h4 className="append-result-title">
         Added <span className="mono">{transaction.transactionId}</span> as line{' '}
-        {formatInteger(transaction.lineNumber)}
-      </h3>
+        <span className="mono">{formatInteger(transaction.lineNumber)}</span>
+      </h4>
       {flags.length === 0 ? (
         <p className="panel-note">No flags</p>
       ) : (
         <ul className="append-flags">
           {flags.map((flag) => (
             <li key={flag.type}>
-              <Badge tone={FLAG_TONES[flag.type]}>
+              <Badge tone={FLAG_TONES[flag.type]} dot>
                 {FLAG_LABELS[flag.type]}
               </Badge>
               <span>{flag.detail}</span>
@@ -25,7 +25,7 @@ function AppendResult({ result }: { result: AppendResponse }) {
           ))}
         </ul>
       )}
-      <dl className="summary-values">
+      <dl className="stat-inline">
         <div>
           <dt>Bucket updated</dt>
           <dd className="mono">{formatInteger(result.bucketIndex)}</dd>

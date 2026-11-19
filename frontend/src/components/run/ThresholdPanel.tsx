@@ -8,11 +8,11 @@ import {
 } from '../../format'
 import { useRun } from '../../run/RunContext'
 import { useThreshold } from '../../run/useThreshold'
-import Alert from '../Alert'
-import Card from '../Card'
+import { ErrorAlert } from '../Alert'
 import Field from '../Field'
+import { Input } from '../Input'
 import SegmentedControl from '../SegmentedControl'
-import Spinner from '../Spinner'
+import { StatsSkeleton } from '../Skeleton'
 
 const PRESETS = ['90', '95', '99', '99.9'] as const
 
@@ -43,70 +43,71 @@ function ThresholdPanel() {
   const { result, error } = useThreshold(p, windowed ? selectedWindow : null)
 
   return (
-    <Card title="High amount threshold">
-      <div className="card-stack">
-        <div className="threshold-controls">
-          <SegmentedControl
-            label="Percentile"
-            options={OPTIONS}
-            value={choice}
-            onChange={setChoice}
-          />
-          {choice === 'custom' && (
-            <div className="threshold-custom">
-              <Field
-                label="Custom percentile"
-                hint="Above 0, up to 100."
-                error={customError}
-              >
-                <input
-                  inputMode="decimal"
-                  value={custom}
-                  onChange={(e) => setCustom(e.target.value)}
-                />
-              </Field>
-            </div>
-          )}
-          <div className="checkbox-field">
-            <label>
-              <input
-                type="checkbox"
-                checked={windowed}
-                disabled={!windowSelected}
-                onChange={(e) => setUseWindow(e.target.checked)}
-              />
-              Use selected window
-            </label>
-            <p className="panel-note">
-              {windowSelected
-                ? `Selected window: ${formatEpochSeconds(selectedWindow.from)} to ${formatEpochSeconds(selectedWindow.to)} IST.`
-                : 'Query a window in the time window analytics above to use it here.'}
-            </p>
-          </div>
-        </div>
-
-        {p === null ? (
-          <p className="panel-note">
-            Enter a percentile to compute the threshold.
-          </p>
-        ) : error ? (
-          <Alert tone="danger" title={error.code}>
-            {error.message}
-          </Alert>
-        ) : result === null ? (
-          <div className="panel-loading">
-            <Spinner label="Computing threshold" />
-          </div>
-        ) : (
-          <ThresholdValues result={result} windowed={windowed} />
-        )}
-
+    <div className="panel-stack">
+      <div className="panel-heading">
+        <h3 className="panel-title">Explore a percentile</h3>
         <p className="panel-note">
-          Flags on this run use the P{configured} threshold set when the run was
-          created.
+          Quickselect finds the percentile on the server, over the whole run or
+          the selected window.
         </p>
       </div>
-    </Card>
+      <div className="threshold-controls">
+        <SegmentedControl
+          label="Percentile"
+          options={OPTIONS}
+          value={choice}
+          onChange={setChoice}
+        />
+        {choice === 'custom' && (
+          <div className="threshold-custom">
+            <Field
+              label="Custom percentile"
+              hint="Above 0, up to 100."
+              error={customError}
+            >
+              <Input
+                inputMode="decimal"
+                value={custom}
+                onChange={(e) => setCustom(e.target.value)}
+              />
+            </Field>
+          </div>
+        )}
+        <div className="checkbox-field">
+          <label>
+            <input
+              type="checkbox"
+              checked={windowed}
+              disabled={!windowSelected}
+              onChange={(e) => setUseWindow(e.target.checked)}
+            />
+            Use selected window
+          </label>
+          <p className="panel-note">
+            {windowSelected
+              ? `Selected window: ${formatEpochSeconds(selectedWindow.from)} to ${formatEpochSeconds(selectedWindow.to)} IST.`
+              : 'Query a window on the Time windows tab to use it here.'}
+          </p>
+        </div>
+      </div>
+
+      {p === null ? (
+        <p className="panel-note">
+          Enter a percentile to compute the threshold.
+        </p>
+      ) : error ? (
+        <ErrorAlert error={error} />
+      ) : result === null ? (
+        <StatsSkeleton label="Computing threshold" />
+      ) : (
+        <ThresholdValues result={result} windowed={windowed} />
+      )}
+
+      <p className="panel-note">
+        Flags on this run use the P{configured} threshold set when the run was
+        created.
+      </p>
+    </div>
   )
 }
 
@@ -118,7 +119,7 @@ interface ThresholdValuesProps {
 function ThresholdValues({ result, windowed }: ThresholdValuesProps) {
   return (
     <>
-      <dl className="summary-values">
+      <dl className="stat-inline">
         <div>
           <dt>P{result.percentile} threshold (INR)</dt>
           <dd className="mono">{formatRupees(result.valuePaise)}</dd>

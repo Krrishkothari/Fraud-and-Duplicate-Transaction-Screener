@@ -1,4 +1,5 @@
 import type { FlagType } from '../api/types'
+import type { Tone } from '../components/Badge'
 
 export const FLAG_TYPES: FlagType[] = [
   'BLACKLISTED',
@@ -12,8 +13,9 @@ export const FLAG_LABELS: Record<FlagType, string> = {
   HIGH_AMOUNT: 'High amount',
 }
 
-export const FLAG_TONES: Record<FlagType, 'danger' | 'warning' | 'info'> = {
+/** Red for a blacklisted account, amber for a high amount and blue for a duplicate ID. */
+export const FLAG_TONES: Record<FlagType, Tone> = {
   BLACKLISTED: 'danger',
-  DUPLICATE: 'warning',
-  HIGH_AMOUNT: 'info',
+  DUPLICATE: 'info',
+  HIGH_AMOUNT: 'warning',
 }

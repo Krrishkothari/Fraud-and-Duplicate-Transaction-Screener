@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 /** The address for questions about the privacy policy and terms. */
 export const CONTACT_EMAIL = 'sonarhardik08@gmail.com'
@@ -17,12 +18,13 @@ export function LegalPage({
   intro,
   children,
 }: LegalPageProps) {
+  useDocumentTitle(title)
   return (
-    <article className="page legal">
-      <header className="page-header">
+    <article className="container legal">
+      <header className="docs-header">
         <h1>{title}</h1>
         <p className="legal-updated">Last updated {lastUpdated}</p>
-        <p>{intro}</p>
+        <p className="docs-lede">{intro}</p>
       </header>
       {children}
     </article>

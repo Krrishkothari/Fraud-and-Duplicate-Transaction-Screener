@@ -3,6 +3,7 @@ import type {
   BenchmarkSettings,
 } from '../../benchmarks/results'
 import { formatBytes, formatDateTime } from '../../format'
+import { REPO_URL } from '../../links'
 
 interface EnvironmentStripProps {
   environment: BenchmarkEnvironment
@@ -12,7 +13,7 @@ interface EnvironmentStripProps {
 /** Where and how the results were measured, straight from the results file. */
 function EnvironmentStrip({ environment, settings }: EnvironmentStripProps) {
   return (
-    <dl className="environment-strip">
+    <dl className="environment">
       <div>
         <dt>Machine</dt>
         <dd>{environment.machine}</dd>
@@ -37,7 +38,11 @@ function EnvironmentStrip({ environment, settings }: EnvironmentStripProps) {
       </div>
       <div>
         <dt>Commit</dt>
-        <dd className="mono">{environment.commit}</dd>
+        <dd>
+          <a href={`${REPO_URL}/commit/${environment.commit}`}>
+            {environment.commit}
+          </a>
+        </dd>
       </div>
       <div>
         <dt>Method</dt>

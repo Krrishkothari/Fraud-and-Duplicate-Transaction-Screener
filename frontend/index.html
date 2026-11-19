@@ -4,11 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TxnScreen</title>
+    <script>
+      // Applies the theme picked in the header before the first paint, so the page never flashes.
+      try {
+        var theme = localStorage.getItem('txnscreen-theme')
+        if (theme === 'light' || theme === 'dark') {
+          document.documentElement.dataset.theme = theme
+        }
+      } catch (error) {
+        // Storage is blocked: the page follows the system setting.
+      }
+    </script>
     <meta
       name="description"
       content="Screen transaction files for duplicate transaction IDs, blacklisted accounts and unusual amounts. Built for fraud analysts."
     />
-    <meta name="theme-color" content="#0f766e" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      content="#fafafa"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0b0b0c"
+      media="(prefers-color-scheme: dark)"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="TxnScreen" />
     <meta

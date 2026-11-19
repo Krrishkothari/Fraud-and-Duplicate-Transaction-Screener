@@ -1,3 +1,4 @@
+import { CircleAlert } from 'lucide-react'
 import { cloneElement, useId } from 'react'
 import type { ReactElement } from 'react'
 
@@ -9,13 +10,16 @@ interface FieldControlProps {
 
 interface FieldProps {
   label: string
+  /** Marks the field as optional beside its label. */
+  optional?: boolean
   hint?: string
   error?: string
-  /** A single input, select or textarea. Field links it to the label and messages. */
+  /** A single Input, Select or textarea. Field links it to the label and messages. */
   children: ReactElement<FieldControlProps>
 }
 
-function Field({ label, hint, error, children }: FieldProps) {
+/** A label above its control, with helper text and any error below. */
+function Field({ label, optional = false, hint, error, children }: FieldProps) {
   const id = useId()
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
@@ -26,6 +30,7 @@ function Field({ label, hint, error, children }: FieldProps) {
     <div className="field">
       <label className="field-label" htmlFor={id}>
         {label}
+        {optional && <span className="field-optional">Optional</span>}
       </label>
       {cloneElement(children, {
         id,
@@ -39,6 +44,7 @@ function Field({ label, hint, error, children }: FieldProps) {
       )}
       {error && (
         <p className="field-error" id={errorId}>
+          <CircleAlert aria-hidden="true" />
           {error}
         </p>
       )}

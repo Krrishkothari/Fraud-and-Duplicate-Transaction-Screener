@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import type { FilterStats } from '../../api/types'
 import { formatBytes, formatInteger, formatPercent } from '../../format'
 import Alert from '../Alert'
+import Badge from '../Badge'
+import Card from '../Card'
 import InfoTip from '../InfoTip'
 
 const FPR_EXPLANATION =
@@ -15,16 +17,27 @@ interface FilterStatsCardProps {
 /** One Bloom filter's size, fill, false-positive rates and lookup counts, as the run summary reports them. */
 function FilterStatsCard({ title, stats }: FilterStatsCardProps) {
   return (
-    <section className="filter-card">
-      <h3 className="filter-card-title">{title}</h3>
+    <Card
+      title={title}
+      headingLevel={3}
+      actions={
+        stats.saturated && (
+          <Badge tone="warning" dot>
+            Over capacity
+          </Badge>
+        )
+      }
+    >
       {stats.saturated && stats.suggestedBits !== null && (
-        <Alert tone="warning">
-          This filter is over capacity. Results are still exact because every
-          hit is confirmed, but more lookups reach the exact store. Suggested
-          size: {formatInteger(stats.suggestedBits)} bits.
-        </Alert>
+        <div className="filter-card-alert">
+          <Alert tone="warning">
+            This filter is over capacity. Results are still exact because every
+            hit is confirmed, but more lookups reach the exact store. Suggested
+            size: {formatInteger(stats.suggestedBits)} bits.
+          </Alert>
+        </div>
       )}
-      <dl className="stat-rows">
+      <StatGroup title="Size">
         <StatRow label="Bits (m)">{formatInteger(stats.bitSize)}</StatRow>
         <StatRow label="Hash functions (k)">{stats.hashCount}</StatRow>
         <StatRow label="Memory">{formatBytes(stats.memoryBytes)}</StatRow>
@@ -40,6 +53,8 @@ function FilterStatsCard({ title, stats }: FilterStatsCardProps) {
           </span>
           {formatPercent(stats.fillRatio, 1)}
         </StatRow>
+      </StatGroup>
+      <StatGroup title="False positive rate">
         <StatRow label="Theoretical FPR">
           {formatPercent(stats.theoreticalFpr)}
         </StatRow>
@@ -55,6 +70,8 @@ function FilterStatsCard({ title, stats }: FilterStatsCardProps) {
         >
           {formatPercent(stats.measuredFpr)}
         </StatRow>
+      </StatGroup>
+      <StatGroup title="Lookups">
         <StatRow label="Bloom positives">
           {formatInteger(stats.bloomPositives)}
         </StatRow>
@@ -70,7 +87,22 @@ function FilterStatsCard({ title, stats }: FilterStatsCardProps) {
         <StatRow label="Lookups avoided">
           {formatInteger(stats.lookupsAvoided)}
         </StatRow>
-      </dl>
+      </StatGroup>
+    </Card>
+  )
+}
+
+function StatGroup({
+  title,
+  children,
+}: {
+  title: string
+  children: ReactNode
+}) {
+  return (
+    <section className="stat-group">
+      <h4 className="stat-group-title">{title}</h4>
+      <dl className="stat-rows">{children}</dl>
     </section>
   )
 }

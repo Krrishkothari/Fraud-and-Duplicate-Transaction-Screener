@@ -25,16 +25,17 @@ function WindowTooltip({ point, threshold }: WindowTooltipProps) {
           <dd className="mono">{formatInteger(point.count)}</dd>
         </div>
         <div>
-          <dt>Total amount</dt>
-          <dd className="mono">INR {formatRupees(point.sumPaise)}</dd>
+          <dt>Total amount (INR)</dt>
+          <dd className="mono">{formatRupees(point.sumPaise)}</dd>
         </div>
         <div>
-          <dt>Largest amount</dt>
-          <dd className="mono">INR {formatRupees(point.maxPaise)}</dd>
+          <dt>Largest amount (INR)</dt>
+          <dd className="mono">{formatRupees(point.maxPaise)}</dd>
         </div>
       </dl>
       {above && (
         <p className="chart-tooltip-flag">
+          <span className="dot dot-danger" aria-hidden="true" />
           Above the P{threshold.percentile} threshold
         </p>
       )}

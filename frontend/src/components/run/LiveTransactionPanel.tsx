@@ -19,10 +19,10 @@ import type {
   AppendField,
   AppendFieldErrors,
 } from '../../run/appendFieldErrors'
-import Alert from '../Alert'
+import Alert, { ErrorAlert } from '../Alert'
 import Button from '../Button'
-import Card from '../Card'
 import Field from '../Field'
+import { Input } from '../Input'
 import AppendResult from './AppendResult'
 
 const EMPTY: AppendRequest = {
@@ -114,85 +114,83 @@ function LiveTransactionPanel() {
   const submitting = submit.status === 'submitting'
 
   return (
-    <Card title="Live transactions">
-      <div className="card-stack">
+    <div className="panel-stack">
+      <div className="panel-heading">
+        <h3 className="panel-title">Add a live transaction</h3>
         <p className="panel-note">
           Add one transaction to this run. The server screens it with the same
           Bloom filters and exact checks as the file rows, then updates its time
           bucket in the segment tree.
         </p>
-        <form className="card-stack" onSubmit={handleSubmit} noValidate>
-          <div className="form-grid">
-            <Field label="Transaction ID" error={fieldErrors.transactionId}>
-              <input
-                value={values.transactionId}
-                onChange={(e) => change('transactionId', e.target.value)}
-              />
-            </Field>
-            <Field label="Account ID" error={fieldErrors.accountId}>
-              <input
-                value={values.accountId}
-                onChange={(e) => change('accountId', e.target.value)}
-              />
-            </Field>
-            <Field
-              label="Amount (INR)"
-              hint="Up to 2 decimal places, such as 1234.50."
-              error={fieldErrors.amount}
-            >
-              <input
-                inputMode="decimal"
-                value={values.amount}
-                onChange={(e) => change('amount', e.target.value)}
-              />
-            </Field>
-            <Field label="Timestamp (IST)" error={fieldErrors.timestamp}>
-              <input
-                type="datetime-local"
-                step={1}
-                value={values.timestamp}
-                onChange={(e) => change('timestamp', e.target.value)}
-              />
-            </Field>
-            <Field label="Merchant" error={fieldErrors.merchant}>
-              <input
-                value={values.merchant}
-                onChange={(e) => change('merchant', e.target.value)}
-              />
-            </Field>
-          </div>
-          <PrefillNote state={prefill} />
-          <div className="form-actions">
-            <Button
-              variant="secondary"
-              onClick={copyFirstFlagged}
-              disabled={prefill.status === 'loading' || submitting}
-            >
-              Prefill from an existing transaction
-            </Button>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? 'Adding' : 'Add transaction'}
-            </Button>
-          </div>
-        </form>
-        {submit.status === 'failed' && (
-          <Alert tone="danger" title={submit.error.code}>
-            {submit.error.message}
-          </Alert>
-        )}
-        {submit.status === 'done' && (
-          <>
-            <AppendResult result={submit.result} />
-            {submit.refreshError && (
-              <Alert tone="warning" title="The page did not refresh">
-                The transaction was added, but the run could not be reloaded:{' '}
-                {submit.refreshError.message}
-              </Alert>
-            )}
-          </>
-        )}
       </div>
-    </Card>
+      <form className="panel-stack" onSubmit={handleSubmit} noValidate>
+        <div className="live-fields">
+          <Field label="Transaction ID" error={fieldErrors.transactionId}>
+            <Input
+              value={values.transactionId}
+              onChange={(e) => change('transactionId', e.target.value)}
+            />
+          </Field>
+          <Field label="Account ID" error={fieldErrors.accountId}>
+            <Input
+              value={values.accountId}
+              onChange={(e) => change('accountId', e.target.value)}
+            />
+          </Field>
+          <Field
+            label="Amount (INR)"
+            hint="Up to 2 decimal places, such as 1234.50."
+            error={fieldErrors.amount}
+          >
+            <Input
+              inputMode="decimal"
+              value={values.amount}
+              onChange={(e) => change('amount', e.target.value)}
+            />
+          </Field>
+          <Field label="Timestamp (IST)" error={fieldErrors.timestamp}>
+            <Input
+              type="datetime-local"
+              step={1}
+              value={values.timestamp}
+              onChange={(e) => change('timestamp', e.target.value)}
+            />
+          </Field>
+          <Field label="Merchant" error={fieldErrors.merchant}>
+            <Input
+              value={values.merchant}
+              onChange={(e) => change('merchant', e.target.value)}
+            />
+          </Field>
+        </div>
+        <PrefillNote state={prefill} />
+        <div className="form-actions">
+          <Button
+            variant="secondary"
+            onClick={copyFirstFlagged}
+            loading={prefill.status === 'loading'}
+            disabled={submitting}
+          >
+            Prefill from an existing transaction
+          </Button>
+          <Button type="submit" loading={submitting}>
+            {submitting ? 'Adding' : 'Add transaction'}
+          </Button>
+        </div>
+      </form>
+      {submit.status === 'failed' && <ErrorAlert error={submit.error} />}
+      {submit.status === 'done' && (
+        <>
+          <AppendResult result={submit.result} />
+          {submit.refreshError && (
+            <Alert tone="warning" title="The page did not refresh">
+              The transaction was added, but the run could not be reloaded:{' '}
+              {submit.refreshError.message}
+            </Alert>
+          )}
+        </>
+      )}
+    </div>
   )
 }
 
@@ -212,11 +210,7 @@ function PrefillNote({ state }: { state: PrefillState }) {
         </p>
       )
     case 'failed':
-      return (
-        <Alert tone="danger" title={state.error.code}>
-          {state.error.message}
-        </Alert>
-      )
+      return <ErrorAlert error={state.error} />
     default:
       return null
   }

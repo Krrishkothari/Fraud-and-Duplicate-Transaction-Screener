@@ -4,40 +4,108 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-height) + var(--space-5));
+}
+
 body {
   margin: 0;
-  background: var(--gray-50);
-  color: var(--gray-900);
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: var(--font-sans);
-  font-size: var(--text-md);
-  line-height: 1.5;
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 h1,
 h2,
 h3,
-p {
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
   margin: 0;
 }
 
-h1 {
-  font-size: 1.5rem;
+h1,
+h2,
+h3,
+h4 {
   font-weight: 600;
-  line-height: 1.25;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-title);
+  line-height: 1.2;
+  letter-spacing: -0.022em;
+}
+
+h2 {
+  font-size: var(--text-section);
+  line-height: 1.35;
+  letter-spacing: -0.012em;
+}
+
+h3 {
+  font-size: var(--text-lg);
+  line-height: 1.4;
+  letter-spacing: -0.006em;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 a {
-  color: var(--accent);
+  color: var(--color-accent);
+  text-decoration: none;
+  text-underline-offset: 3px;
+  transition: color var(--duration) var(--ease);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+svg.lucide {
+  flex: none;
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
-/* IDs and numbers */
-.mono {
+::selection {
+  background: var(--color-accent-subtle);
+  color: var(--color-text);
+}
+
+/* IDs, column names, code values and numbers */
+.mono,
+code,
+kbd {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.num,
+.tabular {
   font-variant-numeric: tabular-nums;
 }
 
@@ -49,4 +117,33 @@ a {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 100;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

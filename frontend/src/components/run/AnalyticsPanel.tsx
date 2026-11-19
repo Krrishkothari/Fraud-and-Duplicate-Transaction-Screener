@@ -2,34 +2,23 @@ import type { SeriesResponse } from '../../api/types'
 import { formatEpochSeconds, formatInteger, formatMicros } from '../../format'
 import { useRun } from '../../run/RunContext'
 import { useSeries } from '../../run/useSeries'
-import Alert from '../Alert'
-import Card from '../Card'
-import Spinner from '../Spinner'
+import { ErrorAlert } from '../Alert'
+import { Loading, Skeleton } from '../Skeleton'
 import MaxAmountChart from './MaxAmountChart'
 import VolumeChart from './VolumeChart'
 import WindowQueryForm from './WindowQueryForm'
-import { toChartPoints } from './chartData'
+import { CHART_HEIGHT, toChartPoints } from './chartData'
 
 /** Segment tree analytics over the selected window: two charts of its windows and a single window query. */
 function AnalyticsPanel() {
   const { series, error } = useSeries()
   return (
-    <Card title="Time window analytics">
-      <div className="card-stack">
-        {error && (
-          <Alert tone="danger" title={error.code}>
-            {error.message}
-          </Alert>
-        )}
-        {!series && !error && (
-          <div className="panel-loading">
-            <Spinner label="Loading charts" />
-          </div>
-        )}
-        {series && <SeriesCharts series={series} />}
-        <WindowQueryForm />
-      </div>
-    </Card>
+    <div className="panel-stack">
+      {error && <ErrorAlert error={error} />}
+      {!series && !error && <ChartsSkeleton />}
+      {series && <SeriesCharts series={series} />}
+      <WindowQueryForm />
+    </div>
   )
 }
 
@@ -43,7 +32,8 @@ function SeriesCharts({ series }: { series: SeriesResponse }) {
         {formatInteger(series.points.length)} windows from{' '}
         {formatEpochSeconds(series.effectiveFrom)} to{' '}
         {formatEpochSeconds(series.effectiveTo)} IST. The segment tree answered
-        all of them in {formatMicros(series.algoMicros)}.
+        all of them in{' '}
+        <span className="mono">{formatMicros(series.algoMicros)}</span>.
       </p>
       <div className="charts">
         <VolumeChart points={points} spanSeconds={spanSeconds} />
@@ -54,6 +44,22 @@ function SeriesCharts({ series }: { series: SeriesResponse }) {
         />
       </div>
     </>
+  )
+}
+
+function ChartsSkeleton() {
+  return (
+    <Loading label="Loading charts">
+      <Skeleton width="60%" height={10} />
+      <div className="charts">
+        {[0, 1].map((index) => (
+          <div key={index} className="chart">
+            <Skeleton width="50%" height={12} />
+            <Skeleton width="100%" height={CHART_HEIGHT} />
+          </div>
+        ))}
+      </div>
+    </Loading>
   )
 }
 

@@ -7,37 +7,60 @@ interface PaginationProps {
   label: string
   /** The 0-based page number. */
   page: number
+  pageSize: number
+  totalItems: number
   totalPages: number
+  /** What the items are, in the plural, such as "flags". */
+  noun: string
   onChange: (page: number) => void
 }
 
-/** Previous and next controls for a server-paged list. Shows nothing when there is one page or none. */
-function Pagination({ label, page, totalPages, onChange }: PaginationProps) {
-  if (totalPages <= 1) {
-    return null
-  }
+/** Which items of a server-paged list are in view, with previous and next controls when there is more than one page. */
+function Pagination({
+  label,
+  page,
+  pageSize,
+  totalItems,
+  totalPages,
+  noun,
+  onChange,
+}: PaginationProps) {
+  const first = page * pageSize + 1
+  const last = Math.min((page + 1) * pageSize, totalItems)
   return (
-    <nav className="pagination" aria-label={label}>
-      <Button
-        variant="secondary"
-        disabled={page === 0}
-        onClick={() => onChange(page - 1)}
-      >
-        <ChevronLeft size={16} aria-hidden="true" />
-        Previous
-      </Button>
-      <span className="pagination-status">
-        Page {formatInteger(page + 1)} of {formatInteger(totalPages)}
-      </span>
-      <Button
-        variant="secondary"
-        disabled={page >= totalPages - 1}
-        onClick={() => onChange(page + 1)}
-      >
-        Next
-        <ChevronRight size={16} aria-hidden="true" />
-      </Button>
-    </nav>
+    <div className="pagination">
+      <p className="pagination-status">
+        Showing <span className="mono">{formatInteger(first)}</span> to{' '}
+        <span className="mono">{formatInteger(last)}</span> of{' '}
+        <span className="mono">{formatInteger(totalItems)}</span> {noun}
+      </p>
+      {totalPages > 1 && (
+        <nav className="pagination-controls" aria-label={label}>
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={page === 0}
+            onClick={() => onChange(page - 1)}
+          >
+            <ChevronLeft aria-hidden="true" />
+            Previous
+          </Button>
+          <span className="pagination-page">
+            Page <span className="mono">{formatInteger(page + 1)}</span> of{' '}
+            <span className="mono">{formatInteger(totalPages)}</span>
+          </span>
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={page >= totalPages - 1}
+            onClick={() => onChange(page + 1)}
+          >
+            Next
+            <ChevronRight aria-hidden="true" />
+          </Button>
+        </nav>
+      )}
+    </div>
   )
 }
 

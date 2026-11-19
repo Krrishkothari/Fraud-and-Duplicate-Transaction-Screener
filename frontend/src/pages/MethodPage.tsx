@@ -1,7 +1,13 @@
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import Card from '../components/Card'
 import Table from '../components/Table'
+import {
+  BloomDiagram,
+  QuickselectDiagram,
+  SegmentTreeDiagram,
+} from '../components/method/Diagrams'
+import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 interface Cost {
   operation: string
@@ -10,12 +16,46 @@ interface Cost {
   note: string
 }
 
-const SECTIONS = [
-  { id: 'bloom-filter', label: 'Bloom filter' },
-  { id: 'segment-tree', label: 'Segment tree' },
-  { id: 'quickselect', label: 'Randomized Quickselect' },
-  { id: 'limitations', label: 'Limitations' },
+interface Heading {
+  id: string
+  label: string
+}
+
+interface Section extends Heading {
+  subheadings: Heading[]
+}
+
+const SECTIONS: Section[] = [
+  {
+    id: 'bloom-filter',
+    label: 'Bloom filter',
+    subheadings: [
+      { id: 'bloom-filter-how', label: 'How it works' },
+      { id: 'bloom-filter-sizing', label: 'Sizing' },
+      { id: 'bloom-filter-confirmed', label: 'Why every hit is confirmed' },
+      { id: 'bloom-filter-complexity', label: 'Complexity' },
+    ],
+  },
+  {
+    id: 'segment-tree',
+    label: 'Segment tree',
+    subheadings: [
+      { id: 'segment-tree-how', label: 'How it works' },
+      { id: 'segment-tree-complexity', label: 'Complexity' },
+    ],
+  },
+  {
+    id: 'quickselect',
+    label: 'Randomized Quickselect',
+    subheadings: [
+      { id: 'quickselect-how', label: 'How it works' },
+      { id: 'quickselect-complexity', label: 'Complexity' },
+    ],
+  },
+  { id: 'limitations', label: 'Limitations', subheadings: [] },
 ]
+
+const SECTION_IDS = SECTIONS.map((section) => section.id)
 
 const BLOOM_COSTS: Cost[] = [
   {
@@ -105,33 +145,57 @@ const QUICKSELECT_COSTS: Cost[] = [
 ]
 
 function MethodPage() {
+  useDocumentTitle('Method')
+  const active = useActiveSection(SECTION_IDS)
   return (
-    <div className="page method">
-      <header className="page-header">
-        <h1>Method</h1>
-        <p>
-          How the server screens a run. Each algorithm below is the
-          project&apos;s own Java code, not a library, and the browser only
-          shows what the API returns. Formulas are written as text: ln is the
-          natural logarithm and ceil rounds up to a whole number.
-        </p>
-      </header>
+    <div className="container docs">
+      <aside className="docs-toc">
+        <nav aria-label="On this page">
+          <p className="docs-toc-title">On this page</p>
+          <ul>
+            {SECTIONS.map((section) => (
+              <li key={section.id}>
+                <a
+                  href={`#${section.id}`}
+                  className="docs-toc-link"
+                  aria-current={section.id === active ? 'true' : undefined}
+                >
+                  {section.label}
+                </a>
+                {section.subheadings.length > 0 && (
+                  <ul>
+                    {section.subheadings.map((heading) => (
+                      <li key={heading.id}>
+                        <a
+                          href={`#${heading.id}`}
+                          className="docs-toc-link docs-toc-sublink"
+                        >
+                          {heading.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
 
-      <nav className="method-contents" aria-label="On this page">
-        <ul>
-          {SECTIONS.map((section) => (
-            <li key={section.id}>
-              <a href={`#${section.id}`}>{section.label}</a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <article className="docs-article">
+        <header className="docs-header">
+          <h1>Method</h1>
+          <p className="docs-lede">
+            How the server screens a run. Each algorithm below is the
+            project&apos;s own Java code, not a library, and the browser only
+            shows what the API returns. Formulas are written as text:{' '}
+            <code>ln</code> is the natural logarithm and <code>ceil</code>{' '}
+            rounds up to a whole number.
+          </p>
+        </header>
 
-      <Card
-        id="bloom-filter"
-        title="Bloom filter: blacklist and duplicate checks"
-      >
-        <div className="method-body">
+        <section id="bloom-filter" className="docs-section">
+          <h2>Bloom filter: blacklist and duplicate checks</h2>
           <p>
             Each run builds two Bloom filters. One holds the blacklisted account
             IDs. The other starts empty and collects transaction IDs as the
@@ -140,11 +204,12 @@ function MethodPage() {
             of the first.
           </p>
 
-          <h3>How it works</h3>
+          <h3 id="bloom-filter-how">How it works</h3>
           <p>
             A Bloom filter is an array of m bits that all start at 0. To add a
             key, the server hashes it once with 128-bit MurmurHash3, which gives
-            two values h1 and h2, and sets k bits by double hashing:
+            two values <code>h1</code> and <code>h2</code>, and sets k bits by
+            double hashing:
           </p>
           <Formulas>
             <Formula>bit i = (h1 + i * h2) mod m, for i = 0 to k - 1</Formula>
@@ -153,8 +218,9 @@ function MethodPage() {
             To look a key up, it reads the same k bits. If any of them is 0, the
             key was never added. If all k are 1, the key is possibly present.
           </p>
+          <BloomDiagram />
 
-          <h3>Sizing</h3>
+          <h3 id="bloom-filter-sizing">Sizing</h3>
           <p>
             For n keys and a target false positive rate p, the filter uses the
             bit count and hash count that keep false positives lowest:
@@ -178,7 +244,7 @@ function MethodPage() {
             run page then suggests a larger m.
           </p>
 
-          <h3>Why every hit is confirmed</h3>
+          <h3 id="bloom-filter-confirmed">Why every hit is confirmed</h3>
           <p>
             A Bloom filter never gives a false negative: bits are only ever set,
             so a key that was added always reads as possibly present. It can
@@ -198,7 +264,7 @@ function MethodPage() {
             the exact lookups the filter avoided.
           </p>
 
-          <h3>Complexity</h3>
+          <h3 id="bloom-filter-complexity">Complexity</h3>
           <p>
             m is the bit count, k the hash count and len the length of a key.
             The filter stores bits only, never the keys, so its memory is O(m)
@@ -208,16 +274,15 @@ function MethodPage() {
             label="Bloom filter complexity"
             costs={BLOOM_COSTS}
           />
-        </div>
-      </Card>
+        </section>
 
-      <Card id="segment-tree" title="Segment tree: time window totals">
-        <div className="method-body">
+        <section id="segment-tree" className="docs-section">
+          <h2>Segment tree: time window totals</h2>
           <p>
             Each run groups its transactions into time buckets w seconds wide,
             where w is the bucket width set on the Screen page. The first bucket
-            starts at t0, the earliest timestamp rounded down to a multiple of
-            w:
+            starts at <code>t0</code>, the earliest timestamp rounded down to a
+            multiple of w:
           </p>
           <Formulas>
             <Formula>bucket = floor((timestamp - t0) / w)</Formula>
@@ -229,13 +294,15 @@ function MethodPage() {
             add, and the maximum is the larger of the two.
           </p>
 
-          <h3>How it works</h3>
+          <h3 id="segment-tree-how">How it works</h3>
           <p>
             The tree is a perfect binary tree held in arrays, with no pointers.
-            Node 1 is the root, the children of node i are 2i and 2i + 1, and
-            the leaves start at the bucket count rounded up to a power of two.
-            It is built bottom up in one pass over the nodes.
+            Node 1 is the root, the children of node i are <code>2i</code> and{' '}
+            <code>2i + 1</code>, and the leaves start at the bucket count
+            rounded up to a power of two. It is built bottom up in one pass over
+            the nodes.
           </p>
+          <SegmentTreeDiagram />
           <p>
             A window query turns the window into a range of buckets and walks up
             the tree from both ends of the range, merging at most one node from
@@ -255,7 +322,7 @@ function MethodPage() {
             rejected.
           </p>
 
-          <h3>Complexity</h3>
+          <h3 id="segment-tree-complexity">Complexity</h3>
           <p>
             n is the number of transactions, B the number of buckets and c the
             number of windows in a chart.
@@ -264,14 +331,10 @@ function MethodPage() {
             label="Segment tree complexity"
             costs={SEGMENT_TREE_COSTS}
           />
-        </div>
-      </Card>
+        </section>
 
-      <Card
-        id="quickselect"
-        title="Randomized Quickselect: the high amount threshold"
-      >
-        <div className="method-body">
+        <section id="quickselect" className="docs-section">
+          <h2>Randomized Quickselect: the high amount threshold</h2>
           <p>
             A run&apos;s high amount threshold is the p-th percentile of its n
             amounts by the nearest-rank method: the k-th smallest amount, where
@@ -286,7 +349,7 @@ function MethodPage() {
             rank.
           </p>
 
-          <h3>How it works</h3>
+          <h3 id="quickselect-how">How it works</h3>
           <p>
             Each round picks a random pivot from the remaining range and splits
             the range into three parts: amounts less than the pivot, equal to it
@@ -296,6 +359,7 @@ function MethodPage() {
             amounts repeat: a block of equal amounts is settled in one round
             instead of shrinking a little at a time.
           </p>
+          <QuickselectDiagram />
           <p>
             Pivots come from a random generator seeded with the run&apos;s seed,
             so the same file and settings always give the same result.
@@ -315,7 +379,7 @@ function MethodPage() {
             against each other.
           </p>
 
-          <h3>Complexity</h3>
+          <h3 id="quickselect-complexity">Complexity</h3>
           <p>
             n is the number of amounts in the run and w the number in a time
             window.
@@ -324,44 +388,75 @@ function MethodPage() {
             label="Randomized Quickselect complexity"
             costs={QUICKSELECT_COSTS}
           />
-        </div>
-      </Card>
+        </section>
 
-      <Card id="limitations" title="Limitations">
-        <ul className="method-limits">
-          <li>
-            <strong>No deletion from a Bloom filter.</strong> Bits are shared
-            between keys, so clearing the bits of one key could clear a bit
-            another key needs, and that key would then read as never added. Keys
-            can only be added. To screen against a smaller blacklist, create a
-            new run.
-          </li>
-          <li>
-            <strong>Runs live in memory only.</strong> The server keeps each run
-            in memory, with no database, so runs expire and every run is lost
-            when the server restarts. The{' '}
-            <Link to="/privacy">privacy policy</Link> says how long a run is
-            kept. A file also has to fit in the server&apos;s memory.
-          </li>
-          <li>
-            <strong>The threshold is not recomputed on live append.</strong> The
-            high amount threshold is computed once, when the run is created. A
-            transaction added on the run page is compared with that threshold,
-            and the threshold does not move. A percentile for a time window is
-            computed when you ask for it, so it does include added transactions.
-          </li>
-          <li>
-            <strong>Window totals are exact to the bucket width.</strong> A
-            window query covers every bucket the window touches, so a window
-            that starts or ends inside a bucket counts the whole bucket. The
-            percentile for a window uses exact timestamps, so its count can
-            differ from the window total&apos;s count. Use a narrower bucket for
-            finer windows.
-          </li>
-        </ul>
-      </Card>
+        <section id="limitations" className="docs-section">
+          <h2>Limitations</h2>
+          <ul className="limitations">
+            <li>
+              <strong>No deletion from a Bloom filter.</strong> Bits are shared
+              between keys, so clearing the bits of one key could clear a bit
+              another key needs, and that key would then read as never added.
+              Keys can only be added. To screen against a smaller blacklist,
+              create a new run.
+            </li>
+            <li>
+              <strong>Runs live in memory only.</strong> The server keeps each
+              run in memory, with no database, so runs expire and every run is
+              lost when the server restarts. The{' '}
+              <Link to="/privacy">privacy policy</Link> says how long a run is
+              kept. A file also has to fit in the server&apos;s memory.
+            </li>
+            <li>
+              <strong>The threshold is not recomputed on live append.</strong>{' '}
+              The high amount threshold is computed once, when the run is
+              created. A transaction added on the run page is compared with that
+              threshold, and the threshold does not move. A percentile for a
+              time window is computed when you ask for it, so it does include
+              added transactions.
+            </li>
+            <li>
+              <strong>Window totals are exact to the bucket width.</strong> A
+              window query covers every bucket the window touches, so a window
+              that starts or ends inside a bucket counts the whole bucket. The
+              percentile for a window uses exact timestamps, so its count can
+              differ from the window total&apos;s count. Use a narrower bucket
+              for finer windows.
+            </li>
+          </ul>
+        </section>
+      </article>
     </div>
   )
+}
+
+/**
+ * The section nearest the top of the viewport, for the contents list to mark. ids must keep the same identity
+ * between renders.
+ */
+function useActiveSection(ids: string[]): string {
+  const [active, setActive] = useState(ids[0])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entering = entries.find((entry) => entry.isIntersecting)
+        if (entering) {
+          setActive(entering.target.id)
+        }
+      },
+      { rootMargin: '-96px 0px -60% 0px' },
+    )
+    for (const id of ids) {
+      const element = document.getElementById(id)
+      if (element) {
+        observer.observe(element)
+      }
+    }
+    return () => observer.disconnect()
+  }, [ids])
+
+  return active
 }
 
 function Formulas({ children }: { children: ReactNode }) {
@@ -374,28 +469,26 @@ function Formula({ children }: { children: ReactNode }) {
 
 function ComplexityTable({ label, costs }: { label: string; costs: Cost[] }) {
   return (
-    <div className="complexity-table">
-      <Table label={label}>
-        <thead>
-          <tr>
-            <th scope="col">Operation</th>
-            <th scope="col">Time</th>
-            <th scope="col">Space</th>
-            <th scope="col">Notes</th>
+    <Table label={label}>
+      <thead>
+        <tr>
+          <th scope="col">Operation</th>
+          <th scope="col">Time</th>
+          <th scope="col">Space</th>
+          <th scope="col">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {costs.map((cost) => (
+          <tr key={cost.operation}>
+            <td>{cost.operation}</td>
+            <td className="mono">{cost.time}</td>
+            <td className="mono">{cost.space}</td>
+            <td className="cell-wrap">{cost.note}</td>
           </tr>
-        </thead>
-        <tbody>
-          {costs.map((cost) => (
-            <tr key={cost.operation}>
-              <td>{cost.operation}</td>
-              <td className="mono">{cost.time}</td>
-              <td className="mono">{cost.space}</td>
-              <td>{cost.note}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </div>
+        ))}
+      </tbody>
+    </Table>
   )
 }
 
