@@ -2,11 +2,11 @@ import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { benchmarkResults } from '../benchmarks/results'
 import { ButtonLink } from '../components/Button'
+import CsvHeader from '../components/CsvHeader'
 import BenchmarkHighlights from '../components/home/BenchmarkHighlights'
 import ProductPreview from '../components/home/ProductPreview'
+import { TRANSACTION_COLUMNS } from '../csv'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
-
-const CSV_HEADER = 'transaction_id,account_id,amount,timestamp,merchant'
 
 const STEPS = [
   {
@@ -73,7 +73,7 @@ function HomePage() {
           </div>
           <p className="hero-format">
             <span>Reads CSV files with the header</span>
-            <code>{CSV_HEADER}</code>
+            <CsvHeader columns={TRANSACTION_COLUMNS} />
           </p>
         </div>
         <ProductPreview />
@@ -122,9 +122,9 @@ function HomePage() {
               <Link
                 className="text-link"
                 to={`/method#${algorithm.anchor}`}
-                aria-label={`How the ${algorithm.name} works`}
+                aria-label={`Read the method for the ${algorithm.name}`}
               >
-                How it works
+                Read the method
                 <ArrowRight aria-hidden="true" />
               </Link>
             </li>

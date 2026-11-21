@@ -18,15 +18,27 @@
   display: none !important;
 }
 
-/* Header: sticky, with a blur over content scrolling beneath */
+/*
+ * Header: sticky, with a blur over content scrolling beneath. The -webkit- line must come first: Lightning
+ * CSS, which minifies the build, keeps only the last of the two, and Chrome reads only the standard one.
+ */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
   background: var(--color-bg-translucent);
   border-bottom: 1px solid var(--color-border);
-  backdrop-filter: saturate(1.8) blur(12px);
-  -webkit-backdrop-filter: saturate(1.8) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  backdrop-filter: saturate(180%) blur(12px);
+}
+
+/* Without backdrop-filter, page text would show through the header, so it turns solid. Same for .form-footer. */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .site-header {
+    background: var(--color-bg);
+  }
 }
 
 .site-header-inner {
@@ -98,6 +110,14 @@
 .menu-button,
 .mobile-menu {
   display: none;
+}
+
+/* Phones and other touch screens: 44px tap targets for the header's icon buttons, with the icons unchanged */
+@media (max-width: 720px), (pointer: coarse) {
+  .site-header-actions .icon-button {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 @media (max-width: 720px) {
@@ -307,4 +327,12 @@
 .site-footer-links a:hover {
   color: var(--color-text);
   text-decoration: none;
+}
+
+/* Who made the site, on its own line under the name and links */
+.site-footer-credit {
+  flex-basis: 100%;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
 }

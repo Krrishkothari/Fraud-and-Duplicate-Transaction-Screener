@@ -9,7 +9,7 @@ import {
 } from 'react-router-dom'
 import { ButtonLink } from './Button'
 import Logo from './Logo'
-import { REPO_URL } from '../links'
+import { REPO_URL, SITE_URL } from '../links'
 import ThemeToggle from './ThemeToggle'
 
 const NAV_ITEMS = [
@@ -18,9 +18,15 @@ const NAV_ITEMS = [
   { to: '/method', label: 'Method' },
 ]
 
+/** The screening form. The header's Start screening button is hidden there, since it would link to itself. */
+const SCREEN_PATH = '/screen'
+
 function Layout() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { pathname } = useLocation()
+  const onScreenPage = pathname === SCREEN_PATH
   useScrollOnNavigate()
+  useCanonicalLink(pathname)
 
   useEffect(() => {
     if (!menuOpen) {
@@ -66,9 +72,15 @@ function Layout() {
             </nav>
             <div className="site-header-actions">
               <ThemeToggle />
-              <ButtonLink to="/screen" size="sm" className="site-header-cta">
-                Start screening
-              </ButtonLink>
+              {!onScreenPage && (
+                <ButtonLink
+                  to={SCREEN_PATH}
+                  size="sm"
+                  className="site-header-cta"
+                >
+                  Start screening
+                </ButtonLink>
+              )}
               <button
                 type="button"
                 className="icon-button menu-button"
@@ -103,11 +115,13 @@ function Layout() {
                   </NavLink>
                 </li>
               ))}
-              <li className="mobile-menu-cta">
-                <ButtonLink to="/screen" onClick={closeMenu}>
-                  Start screening
-                </ButtonLink>
-              </li>
+              {!onScreenPage && (
+                <li className="mobile-menu-cta">
+                  <ButtonLink to={SCREEN_PATH} onClick={closeMenu}>
+                    Start screening
+                  </ButtonLink>
+                </li>
+              )}
             </ul>
           </nav>
         </header>
@@ -139,11 +153,30 @@ function Layout() {
                 </li>
               </ul>
             </nav>
+            <p className="site-footer-credit">
+              A course project for Advanced Algorithms (CIA 3), ATLAS uGDX
+              School of Technology, by Krrish, Hardik and Vedant.
+            </p>
           </div>
         </footer>
       </div>
     </LucideProvider>
   )
+}
+
+/**
+ * Points the canonical link and og:url in index.html at the production address of the page shown, since
+ * index.html serves every route and would otherwise name the home page for all of them.
+ */
+function useCanonicalLink(pathname: string) {
+  useEffect(() => {
+    const url =
+      SITE_URL + (pathname === '/' ? '/' : pathname.replace(/\/+$/, ''))
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', url)
+    document
+      .querySelector('meta[property="og:url"]')
+      ?.setAttribute('content', url)
+  }, [pathname])
 }
 
 /**

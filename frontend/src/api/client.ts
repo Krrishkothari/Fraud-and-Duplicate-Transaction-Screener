@@ -20,7 +20,7 @@ import type {
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '')
 
 export const REQUEST_TIMEOUT_MS = 90_000
-export const SLOW_AFTER_MS = 5_000
+export const SLOW_AFTER_MS = 3_000
 
 /** An error from the API, in the backend's {code, message, details} shape. */
 export class ApiError extends Error {
@@ -56,7 +56,7 @@ export function asApiError(caught: unknown): ApiError {
 }
 
 export interface RequestOptions {
-  /** Called once if the request is still running after 5 seconds. */
+  /** Called once if the request is still running after 3 seconds, as when the server is waking up. */
   onSlow?: () => void
   /** Cancels the request. */
   signal?: AbortSignal
@@ -151,18 +151,28 @@ function isErrorBody(body: unknown): body is ApiErrorBody {
   )
 }
 
+/**
+ * GET /api/health, ignoring the answer. The free hosting tier stops the server after a while without traffic,
+ * so a page that is about to call the API sends this first to start it while the user fills in the form.
+ */
+export function warmUpServer(): void {
+  request('/api/health').catch(() => {
+    // A failed warm-up changes nothing: the real request reports any problem.
+  })
+}
+
 /** GET /api/bloom/plan: the bits, hash count, memory and theoretical FPR for n keys at rate p. */
 export function getBloomPlan(
   n: number,
   p: number,
   k: number | null,
-  signal?: AbortSignal,
+  options: RequestOptions = {},
 ): Promise<BloomPlan> {
   const params = new URLSearchParams({ n: String(n), p: String(p) })
   if (k !== null) {
     params.set('k', String(k))
   }
-  return request<BloomPlan>(`/api/bloom/plan?${params}`, {}, { signal })
+  return request<BloomPlan>(`/api/bloom/plan?${params}`, {}, options)
 }
 
 /** POST /api/runs: screens an uploaded transactions CSV with an optional blacklist CSV. */
@@ -189,12 +199,11 @@ export function createRun(
 }
 
 /** GET /api/runs/{id}: the summary of a run that has not expired. */
-export function getRun(id: string, signal?: AbortSignal): Promise<RunSummary> {
-  return request<RunSummary>(
-    `/api/runs/${encodeURIComponent(id)}`,
-    {},
-    { signal },
-  )
+export function getRun(
+  id: string,
+  options: RequestOptions = {},
+): Promise<RunSummary> {
+  return request<RunSummary>(`/api/runs/${encodeURIComponent(id)}`, {}, options)
 }
 
 /** GET /api/runs/{id}/flags: one page of flagged transactions, of one type or of every type when null. */

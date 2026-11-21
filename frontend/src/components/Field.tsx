@@ -12,6 +12,8 @@ interface FieldProps {
   label: string
   /** Marks the field as optional beside its label. */
   optional?: boolean
+  /** A short reading of the current value right under the control, such as its percent equivalent. */
+  valueNote?: string
   hint?: string
   error?: string
   /** A single Input, Select or textarea. Field links it to the label and messages. */
@@ -19,12 +21,22 @@ interface FieldProps {
 }
 
 /** A label above its control, with helper text and any error below. */
-function Field({ label, optional = false, hint, error, children }: FieldProps) {
+function Field({
+  label,
+  optional = false,
+  valueNote,
+  hint,
+  error,
+  children,
+}: FieldProps) {
   const id = useId()
+  const noteId = `${id}-note`
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
   const describedBy =
-    [hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined
+    [valueNote && noteId, hint && hintId, error && errorId]
+      .filter(Boolean)
+      .join(' ') || undefined
 
   return (
     <div className="field">
@@ -37,6 +49,11 @@ function Field({ label, optional = false, hint, error, children }: FieldProps) {
         'aria-describedby': describedBy,
         'aria-invalid': error ? true : undefined,
       })}
+      {valueNote && (
+        <p className="field-value-note mono" id={noteId}>
+          {valueNote}
+        </p>
+      )}
       {hint && (
         <p className="field-hint" id={hintId}>
           {hint}

@@ -82,6 +82,7 @@ function Results({ results }: { results: BenchmarkResults }) {
         title="Membership: Bloom filter against HashSet"
         verdict="A Bloom filter stores only bits, never the keys, so it needs a small fraction of a HashSet's memory; it is slower than a HashSet to insert and to look up, because it hashes every key and probes k bits, and it can report a key that is not there, which is why every hit is confirmed against an exact set before a flag is raised."
         layout="stacked"
+        note="Why the HashSet's present-key lookups are slower than its absent-key ones: the benchmark looks up present keys through separate String objects in random order, so each hit must compare the stored key's text, which reads that key from memory, while an absent key is almost always ruled out by comparing hash codes, without reading any stored key."
         charts={
           <>
             <ComparisonChart
@@ -296,6 +297,8 @@ interface SectionProps {
   charts: ReactNode
   groups: MetricGroup[]
   sizes: number[]
+  /** A sentence under the table that explains a result which looks wrong at first sight. */
+  note?: string
 }
 
 function Section({
@@ -306,6 +309,7 @@ function Section({
   charts,
   groups,
   sizes,
+  note,
 }: SectionProps) {
   return (
     <section className="bench-section" id={id} aria-labelledby={`${id}-title`}>
@@ -317,6 +321,7 @@ function Section({
         <div className="charts">{charts}</div>
         <MetricTable label={title} sizes={sizes} groups={groups} />
       </div>
+      {note && <p className="bench-note">{note}</p>}
     </section>
   )
 }

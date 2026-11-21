@@ -21,6 +21,16 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+const plainPercent = new Intl.NumberFormat(LOCALE, {
+  style: 'percent',
+  maximumSignificantDigits: 6,
+})
+
+/** A typed fraction as a percentage with no trailing zeros, such as 0.01 shown as 1% and 0.025 as 2.5%. */
+export function formatPlainPercent(fraction: number): string {
+  return plainPercent.format(fraction)
+}
+
 /** A fraction such as 0.01 as a percentage, with 3 decimals unless told otherwise, such as 1.000%. */
 export function formatPercent(fraction: number, decimals = 3): string {
   return `${(fraction * 100).toFixed(decimals)}%`

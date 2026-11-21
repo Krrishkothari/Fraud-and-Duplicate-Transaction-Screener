@@ -10,7 +10,7 @@ stay open until the custom domain (H12) is set up and someone checks them there.
 | [ ] | `api.` subdomain connected to Render with an active certificate | Not done: H12 |
 | [ ] | Favicon (SVG, 32 px PNG, 180 px Apple touch icon) shows in the browser tab and on mobile home screen | In the repository: all three files are in `frontend/public/` and linked in `index.html`. Not yet checked on the live site or a phone |
 | [ ] | No "Made with" or "Built with AI" badge, platform watermark, default Vite title or default icon anywhere | In the repository: the title is "TxnScreen", no Vite or React demo assets remain, and no badge text exists. Not yet checked on the live site, where a hosting badge would appear |
-| [ ] | Privacy policy page live and linked from the footer, every statement true | Linked from the footer, and every statement matches the code: in-memory runs, 30 minutes, 10 runs, deleted on restart, no cookies, no browser storage, no analytics, Vercel and Render named. Not live yet |
+| [ ] | Privacy policy page live and linked from the footer, every statement true | Linked from the footer, and every statement matches the code: in-memory runs, 30 minutes, 10 runs, deleted on restart, no cookies, only the theme choice in browser storage (corrected 21 Nov 2026), no analytics, Vercel and Render named. Not live yet |
 | [ ] | Terms and conditions page live and linked from the footer | Linked from the footer. Not live yet |
 | [x] | No emoji anywhere in the UI, README or report | Every tracked text file scanned, none found |
 | [x] | No em dash character anywhere in the UI copy | Every tracked text file scanned for em and en dashes, none found |

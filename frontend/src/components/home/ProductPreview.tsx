@@ -1,30 +1,69 @@
 import { Download } from 'lucide-react'
 import type { FlagType } from '../../api/types'
+import { formatInteger, formatRupees } from '../../format'
 import { FLAG_LABELS, FLAG_TONES, FLAG_TYPES } from '../../run/flagTypes'
 import Badge from '../Badge'
-import { Skeleton } from '../Skeleton'
+
+/*
+ * Every value below is copied from a real API response: POST /api/runs with data/samples/transactions_1000.csv,
+ * data/samples/blacklist_1000.csv and the default settings, then two rows of each type from its flags. So the
+ * drawing shows what that run really returned, not invented numbers.
+ */
+const FILES = 'transactions_1000.csv with blacklist_1000.csv'
+
+const STATS = [
+  { label: 'Valid rows', value: 1_000 },
+  { label: 'Flags raised', value: 80 },
+  { label: 'Rejected rows', value: 0 },
+]
 
 interface PreviewRow {
+  transactionId: string
+  accountId: string
+  amountPaise: number
   type: FlagType
-  /** Widths of the placeholder values, so the rows do not look stamped out. */
-  widths: [string, string, string]
 }
 
 const ROWS: PreviewRow[] = [
-  { type: 'DUPLICATE', widths: ['74%', '58%', '46%'] },
-  { type: 'BLACKLISTED', widths: ['66%', '70%', '54%'] },
-  { type: 'HIGH_AMOUNT', widths: ['80%', '52%', '72%'] },
-  { type: 'DUPLICATE', widths: ['62%', '64%', '40%'] },
-  { type: 'BLACKLISTED', widths: ['70%', '56%', '60%'] },
-  { type: 'HIGH_AMOUNT', widths: ['58%', '68%', '66%'] },
+  {
+    transactionId: 'TXN00000067',
+    accountId: 'ACC000033',
+    amountPaise: 72_996,
+    type: 'DUPLICATE',
+  },
+  {
+    transactionId: 'TXN00000639',
+    accountId: 'ACC000040',
+    amountPaise: 51_116,
+    type: 'BLACKLISTED',
+  },
+  {
+    transactionId: 'TXN00000318',
+    accountId: 'ACC000021',
+    amountPaise: 5_491_610,
+    type: 'HIGH_AMOUNT',
+  },
+  {
+    transactionId: 'TXN00000314',
+    accountId: 'ACC000048',
+    amountPaise: 386_376,
+    type: 'DUPLICATE',
+  },
+  {
+    transactionId: 'TXN00000339',
+    accountId: 'ACC000034',
+    amountPaise: 165_787,
+    type: 'BLACKLISTED',
+  },
+  {
+    transactionId: 'TXN00000758',
+    accountId: 'ACC000021',
+    amountPaise: 12_385_310,
+    type: 'HIGH_AMOUNT',
+  },
 ]
 
-const STATS = ['Valid rows', 'Flags raised', 'Rejected rows']
-
-/**
- * A drawing of the run page, built from the app's own components. Values are placeholder bars: every
- * number in the app comes from the API, and this page has no run to show.
- */
+/** A drawing of the run page, built from the app's own components and filled with one real run's results. */
 function ProductPreview() {
   return (
     <figure className="preview">
@@ -32,7 +71,7 @@ function ProductPreview() {
         <div className="preview-header">
           <div>
             <p className="preview-title">Screening run</p>
-            <Skeleton width={148} height={8} />
+            <p className="preview-meta">{FILES}</p>
           </div>
           <span className="preview-button">
             <Download />
@@ -40,10 +79,12 @@ function ProductPreview() {
           </span>
         </div>
         <div className="preview-stats">
-          {STATS.map((label) => (
-            <div key={label} className="preview-stat">
-              <span className="preview-stat-label">{label}</span>
-              <Skeleton width="64%" height={14} />
+          {STATS.map((stat) => (
+            <div key={stat.label} className="preview-stat">
+              <span className="preview-stat-label">{stat.label}</span>
+              <span className="preview-stat-value mono">
+                {formatInteger(stat.value)}
+              </span>
             </div>
           ))}
         </div>
@@ -63,12 +104,12 @@ function ProductPreview() {
             <span className="preview-num">Amount (INR)</span>
             <span>Flag</span>
           </div>
-          {ROWS.map((row, index) => (
-            <div key={index} className="preview-row">
-              <Skeleton width={row.widths[0]} height={8} />
-              <Skeleton width={row.widths[1]} height={8} />
-              <span className="preview-num">
-                <Skeleton width={row.widths[2]} height={8} />
+          {ROWS.map((row) => (
+            <div key={row.transactionId} className="preview-row">
+              <span className="preview-cell mono">{row.transactionId}</span>
+              <span className="preview-cell mono">{row.accountId}</span>
+              <span className="preview-num mono">
+                {formatRupees(row.amountPaise)}
               </span>
               <span>
                 <Badge tone={FLAG_TONES[row.type]} dot>

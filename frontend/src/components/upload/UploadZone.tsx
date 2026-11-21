@@ -3,12 +3,15 @@ import { useId, useRef, useState } from 'react'
 import type { ChangeEvent, DragEvent } from 'react'
 import { formatBytes, formatInteger } from '../../format'
 import Button from '../Button'
+import CsvHeader from '../CsvHeader'
 
 interface UploadZoneProps {
   label: string
   optional?: boolean
-  /** The header row the file must start with, shown in monospace. */
-  header: string
+  /** Names the file input in the form, so a failed submit can move focus to it. */
+  name?: string
+  /** The columns of the header row the file must start with, shown in monospace. */
+  columns: string[]
   /** Limits, such as the row cap. */
   note?: string
   file: File | null
@@ -25,7 +28,8 @@ interface UploadZoneProps {
 function UploadZone({
   label,
   optional = false,
-  header,
+  name,
+  columns,
   note,
   file,
   rows,
@@ -38,7 +42,6 @@ function UploadZone({
   const [typeError, setTypeError] = useState<string | null>(null)
   const shownError = typeError ?? error
   const inputId = `${id}-input`
-  const labelId = `${id}-label`
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
 
@@ -94,17 +97,19 @@ function UploadZone({
 
   return (
     <div className="upload">
-      <span className="field-label" id={labelId}>
+      <span className="field-label" aria-hidden="true">
         {label}
         {optional && <span className="field-optional">Optional</span>}
       </span>
       <input
         ref={input}
         id={inputId}
+        name={name}
         type="file"
         accept=".csv,text/csv"
         className="upload-input visually-hidden"
-        aria-labelledby={labelId}
+        // Its own name: the label element around the drop zone would otherwise name it with all of its text.
+        aria-label={optional ? `${label} (optional)` : label}
         aria-describedby={
           [file === null && hintId, shownError && errorId]
             .filter(Boolean)
@@ -125,12 +130,16 @@ function UploadZone({
           <span className="upload-zone-icon">
             <Upload aria-hidden="true" />
           </span>
-          <span className="upload-zone-title">
+          {/* Touch screens cannot drop files, so they get the second title instead (components.css) */}
+          <span className="upload-zone-title upload-zone-title-pointer">
             Drop your CSV here or{' '}
             <span className="upload-zone-browse">browse</span>
           </span>
+          <span className="upload-zone-title upload-zone-title-touch">
+            Choose a CSV file
+          </span>
           <span className="upload-zone-hint" id={hintId}>
-            <code className="upload-zone-header">{header}</code>
+            <CsvHeader className="upload-zone-header" columns={columns} />
             {note && <span>{note}</span>}
           </span>
         </label>

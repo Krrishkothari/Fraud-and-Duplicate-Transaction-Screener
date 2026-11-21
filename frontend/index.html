@@ -30,17 +30,55 @@
       content="#0b0b0c"
       media="(prefers-color-scheme: dark)"
     />
+    <!-- The app changes the canonical link and og:url to the page shown (Layout.tsx). -->
+    <link rel="canonical" href="https://txnscreen.vercel.app/" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TxnScreen" />
     <meta property="og:title" content="TxnScreen" />
     <meta
       property="og:description"
       content="Screen transaction files for duplicate transaction IDs, blacklisted accounts and unusual amounts. Built for fraud analysts."
     />
+    <meta property="og:url" content="https://txnscreen.vercel.app/" />
+    <meta
+      property="og:image"
+      content="https://txnscreen.vercel.app/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="The TxnScreen logo and name above the line: Screen transaction files for duplicates, blacklisted accounts and unusual amounts."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
+    <noscript>
+      <div
+        style="
+          max-width: 640px;
+          margin: 0 auto;
+          padding: 48px 24px;
+          font-family: system-ui, sans-serif;
+          line-height: 1.6;
+        "
+      >
+        <h1>TxnScreen</h1>
+        <p>
+          Screen transaction files for duplicate transaction IDs, blacklisted
+          accounts and unusual amounts. Built for fraud analysts.
+        </p>
+        <p>The site needs JavaScript to run. Its pages:</p>
+        <ul>
+          <li><a href="/screen">Screen transactions</a></li>
+          <li><a href="/benchmarks">Benchmarks</a></li>
+          <li><a href="/method">Method</a></li>
+        </ul>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

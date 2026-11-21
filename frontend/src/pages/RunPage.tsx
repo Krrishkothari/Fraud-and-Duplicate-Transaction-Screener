@@ -11,6 +11,7 @@ import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
 import { Loading, Skeleton, TableSkeleton } from '../components/Skeleton'
 import Tabs from '../components/Tabs'
+import WakingNotice from '../components/WakingNotice'
 import AnalyticsPanel from '../components/run/AnalyticsPanel'
 import BloomStatsPanel from '../components/run/BloomStatsPanel'
 import FlaggedTable from '../components/run/FlaggedTable'
@@ -39,10 +40,14 @@ function RunPage() {
 function RunView({ id }: { id: string }) {
   const [state, setState] = useState<LoadState>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
+  const [slow, setSlow] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
-    getRun(id, controller.signal).then(
+    getRun(id, {
+      signal: controller.signal,
+      onSlow: () => setSlow(true),
+    }).then(
       (run) => setState({ status: 'loaded', run }),
       (caught: unknown) => {
         if (!controller.signal.aborted) {
@@ -68,12 +73,13 @@ function RunView({ id }: { id: string }) {
 
   function retry() {
     setState({ status: 'loading' })
+    setSlow(false)
     setAttempt((current) => current + 1)
   }
 
   switch (state.status) {
     case 'loading':
-      return <RunSkeleton />
+      return <RunSkeleton slow={slow} />
     case 'expired':
       return (
         <div className="container page">
@@ -86,7 +92,11 @@ function RunView({ id }: { id: string }) {
                 <ButtonLink to="/screen">Start a new screening</ButtonLink>
               }
             >
-              Runs are kept for 30 minutes.
+              <p>Runs are kept for up to 30 minutes.</p>
+              <p>
+                A run can also be cleared earlier, when the server restarts or
+                newer runs push it out.
+              </p>
             </EmptyState>
           </Card>
         </div>
@@ -103,14 +113,15 @@ function RunView({ id }: { id: string }) {
   }
 }
 
-/** The page's shape while the run summary loads. */
-function RunSkeleton() {
+/** The page's shape while the run summary loads, with a note once the load is slow. */
+function RunSkeleton({ slow }: { slow: boolean }) {
   return (
     <div className="container page">
       <PageHeader
         title="Screening run"
         meta={<Skeleton width={320} height={10} />}
       />
+      {slow && <WakingNotice />}
       <Loading label="Loading run">
         <div className="stat-grid">
           {Array.from({ length: 4 }, (_, index) => (

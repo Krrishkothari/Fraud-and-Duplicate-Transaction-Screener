@@ -85,6 +85,7 @@ function ComparisonChart({
     )
     .join('. ')
   const labelOffsets = endLabelOffsets(series)
+  const axis = logAxis(series)
 
   return (
     <figure className="chart" ref={figure}>
@@ -123,7 +124,9 @@ function ComparisonChart({
           <YAxis
             {...VALUE_AXIS_PROPS}
             scale="log"
-            domain={[(min: number) => min / 2, (max: number) => max * 2]}
+            domain={axis.domain}
+            ticks={axis.ticks}
+            interval={0}
             allowDataOverflow
             tickFormatter={(value: number) => formatCompact(value)}
           />
@@ -203,6 +206,32 @@ function ComparisonChart({
       </ResponsiveContainer>
     </figure>
   )
+}
+
+/**
+ * The log scale's range and labels: from the power of ten at or below the smallest value to the one at or above
+ * the largest, labelled at every power of ten between, such as 10, 100, 1K and 10K.
+ */
+function logAxis(series: ChartSeries[]): {
+  domain: [number, number]
+  ticks: number[]
+} {
+  const values = series
+    .flatMap((s) => s.values)
+    .filter((value): value is number => value !== undefined && value > 0)
+  if (values.length === 0) {
+    return { domain: [1, 10], ticks: [1, 10] }
+  }
+  const lowest = Math.floor(Math.log10(Math.min(...values)))
+  const highest = Math.max(
+    Math.ceil(Math.log10(Math.max(...values))),
+    lowest + 1,
+  )
+  const ticks: number[] = []
+  for (let exponent = lowest; exponent <= highest; exponent++) {
+    ticks.push(10 ** exponent)
+  }
+  return { domain: [ticks[0], ticks[ticks.length - 1]], ticks }
 }
 
 function lastIndex(values: (number | undefined)[]): number {

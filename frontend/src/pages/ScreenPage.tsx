@@ -1,9 +1,17 @@
-import { useId, useState } from 'react'
-import type { FormEvent, ReactNode } from 'react'
+import { Info } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
+import type { ChangeEvent, FormEvent, ReactNode } from 'react'
+import { flushSync } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
-import { ApiError, asApiError, createRun, createSampleRun } from '../api/client'
+import {
+  ApiError,
+  asApiError,
+  createRun,
+  createSampleRun,
+  warmUpServer,
+} from '../api/client'
 import type { RunConfigInput } from '../api/types'
-import Alert, { ErrorAlert } from '../components/Alert'
+import { ErrorAlert } from '../components/Alert'
 import Button from '../components/Button'
 import Field from '../components/Field'
 import FilterPlan from '../components/FilterPlan'
@@ -11,9 +19,18 @@ import { Input, Select } from '../components/Input'
 import PageHeader from '../components/PageHeader'
 import SegmentedControl from '../components/SegmentedControl'
 import UploadZone from '../components/upload/UploadZone'
-import { formatInteger } from '../format'
+import WakingNotice from '../components/WakingNotice'
+import { BLACKLIST_COLUMNS, TRANSACTION_COLUMNS } from '../csv'
+import { formatInteger, formatPlainPercent } from '../format'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { useRowCount } from '../hooks/useRowCount'
+import {
+  CONFIG_FIELDS,
+  SAMPLE_FIELDS,
+  fieldError,
+  fieldValue,
+} from '../screen/fieldRules'
+import type { FieldKey } from '../screen/fieldRules'
 
 type Mode = 'upload' | 'sample'
 
@@ -24,37 +41,32 @@ const MODES: { value: Mode; label: string }[] = [
 
 const SAMPLE_SIZES = [1_000, 10_000, 100_000, 200_000]
 
-const CONFIG_DEFAULTS = {
-  expectedInsertions: '',
-  targetFpr: '0.01',
-  hashCount: '',
-  bucketSeconds: '60',
-  percentile: '99',
-  seed: '42',
+const DEFAULT_VALUES: Record<FieldKey, string> = {
+  'config.expectedInsertions': '',
+  'config.targetFpr': '0.01',
+  'config.hashCount': '',
+  'config.bucketSeconds': '60',
+  'config.percentile': '99',
+  'config.seed': '42',
+  'sample.seed': '42',
+  'sample.duplicateRate': '0.02',
+  'sample.blacklistRate': '0.05',
 }
 
-const SAMPLE_DEFAULTS = {
-  size: '10000',
-  seed: '42',
-  duplicateRate: '0.02',
-  blacklistRate: '0.05',
-}
+/** The key of the transactions file's error, and the name of its file input. */
+const TRANSACTIONS_FILE = 'upload.transactions'
 
-type ConfigForm = typeof CONFIG_DEFAULTS
-type SampleForm = typeof SAMPLE_DEFAULTS
 type FieldErrors = Record<string, string>
-
-const SLOW_MESSAGE =
-  'The server is starting up. On the free hosting tier this can take up to a minute.'
 
 function ScreenPage() {
   useDocumentTitle('Screen transactions')
   const navigate = useNavigate()
+  const form = useRef<HTMLFormElement>(null)
   const [mode, setMode] = useState<Mode>('upload')
   const [transactionsFile, setTransactionsFile] = useState<File | null>(null)
   const [blacklistFile, setBlacklistFile] = useState<File | null>(null)
-  const [sample, setSample] = useState<SampleForm>(SAMPLE_DEFAULTS)
-  const [config, setConfig] = useState<ConfigForm>(CONFIG_DEFAULTS)
+  const [sampleSize, setSampleSize] = useState('10000')
+  const [values, setValues] = useState(DEFAULT_VALUES)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [error, setError] = useState<ApiError | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -62,62 +74,110 @@ function ScreenPage() {
   const transactionRows = useRowCount(transactionsFile)
   const blacklistRows = useRowCount(blacklistFile)
 
-  const updateConfig = (key: keyof ConfigForm, value: string) =>
-    setConfig((current) => ({ ...current, [key]: value }))
-  const updateSample = (key: keyof SampleForm, value: string) =>
-    setSample((current) => ({ ...current, [key]: value }))
+  // Starts a sleeping server now, so it is likely awake by the time the form is sent.
+  useEffect(() => {
+    warmUpServer()
+  }, [])
 
-  /** A chosen file answers the missing file error, so it goes as soon as the file does. */
-  function chooseTransactionsFile(file: File | null) {
-    setTransactionsFile(file)
+  function setFieldError(key: string, message: string | null) {
     setFieldErrors((current) => {
+      if ((current[key] ?? null) === message) {
+        return current
+      }
       const next = { ...current }
-      delete next['upload.transactions']
+      if (message === null) {
+        delete next[key]
+      } else {
+        next[key] = message
+      }
       return next
     })
   }
 
+  /**
+   * The props that wire a number input to its value and rule. A field is checked when it loses focus, and
+   * again on every change once it shows an error, so the error goes as soon as the value is fixed.
+   */
+  function numberInput(key: FieldKey) {
+    return {
+      name: key,
+      value: values[key],
+      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+        const raw = event.target.value
+        setValues((current) => ({ ...current, [key]: raw }))
+        if (fieldErrors[key] !== undefined) {
+          setFieldError(key, fieldError(key, raw))
+        }
+      },
+      onBlur: () => setFieldError(key, fieldError(key, values[key])),
+    }
+  }
+
+  /** The percent equivalent under a fraction field, while its value is valid. */
+  function percentNote(key: FieldKey): string | undefined {
+    const value = fieldValue(values[key])
+    return value === undefined || fieldError(key, values[key]) !== null
+      ? undefined
+      : `= ${formatPlainPercent(value)}`
+  }
+
+  /** A chosen file answers the missing file error, so it goes as soon as the file does. */
+  function chooseTransactionsFile(file: File | null) {
+    setTransactionsFile(file)
+    setFieldError(TRANSACTIONS_FILE, null)
+  }
+
+  /** Every problem the form can see before sending, in page order. */
+  function checkForm(): FieldErrors {
+    const errors: FieldErrors = {}
+    if (mode === 'upload' && !transactionsFile) {
+      errors[TRANSACTIONS_FILE] = 'Choose a transactions CSV file.'
+    }
+    const keys =
+      mode === 'sample' ? [...SAMPLE_FIELDS, ...CONFIG_FIELDS] : CONFIG_FIELDS
+    for (const key of keys) {
+      const message = fieldError(key, values[key])
+      if (message !== null) {
+        errors[key] = message
+      }
+    }
+    return errors
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const errors: FieldErrors = {}
-    const runConfig = readConfig(config, errors)
-    if (mode === 'upload' && !transactionsFile) {
-      errors['upload.transactions'] = 'Choose a transactions CSV file.'
-    }
-    const sampleSeed = readNumber(sample.seed, 'sample.seed', errors, true)
-    const duplicateRate = readNumber(
-      sample.duplicateRate,
-      'sample.duplicateRate',
-      errors,
-    )
-    const blacklistRate = readNumber(
-      sample.blacklistRate,
-      'sample.blacklistRate',
-      errors,
-    )
-    const relevant = Object.keys(errors).filter(
-      (key) => !key.startsWith(mode === 'upload' ? 'sample.' : 'upload.'),
-    )
-    setFieldErrors(errors)
-    setError(null)
-    if (relevant.length > 0) {
+    if (submitting) {
       return
     }
+    const errors = checkForm()
+    const firstInvalid = Object.keys(errors)[0]
+    setError(null)
+    if (firstInvalid !== undefined) {
+      // Renders the errors first, so a screen reader hears the message when focus lands on the field.
+      flushSync(() => setFieldErrors(errors))
+      const control = form.current?.elements.namedItem(firstInvalid)
+      if (control instanceof HTMLElement) {
+        control.focus()
+      }
+      return
+    }
+    setFieldErrors({})
 
     setSubmitting(true)
     setSlow(false)
     try {
       const onSlow = () => setSlow(true)
+      const config = runConfig(values)
       const summary =
         mode === 'upload'
-          ? await createRun(transactionsFile!, blacklistFile, runConfig, onSlow)
+          ? await createRun(transactionsFile!, blacklistFile, config, onSlow)
           : await createSampleRun(
               {
-                size: Number(sample.size),
-                seed: sampleSeed,
-                duplicateRate,
-                blacklistRate,
-                config: runConfig,
+                size: Number(sampleSize),
+                seed: fieldValue(values['sample.seed']),
+                duplicateRate: fieldValue(values['sample.duplicateRate']),
+                blacklistRate: fieldValue(values['sample.blacklistRate']),
+                config,
               },
               onSlow,
             )
@@ -132,11 +192,11 @@ function ScreenPage() {
   }
 
   const planN =
-    positiveInteger(config.expectedInsertions) ??
-    (mode === 'sample' ? Number(sample.size) : null)
-  const planP = rateBetweenZeroAndOne(config.targetFpr)
-  const planK = positiveInteger(config.hashCount)
-  const rows = mode === 'upload' ? transactionRows : Number(sample.size)
+    positiveInteger(values['config.expectedInsertions']) ??
+    (mode === 'sample' ? Number(sampleSize) : null)
+  const planP = rateBetweenZeroAndOne(values['config.targetFpr'])
+  const planK = positiveInteger(values['config.hashCount'])
+  const rows = mode === 'upload' ? transactionRows : Number(sampleSize)
   const screeningLabel =
     rows === null ? 'Screening…' : `Screening ${formatInteger(rows)} rows…`
 
@@ -147,7 +207,12 @@ function ScreenPage() {
         description="Upload a transactions file and a blacklist, or generate sample data, then choose the screening settings."
       />
 
-      <form className="screen-layout" onSubmit={handleSubmit} noValidate>
+      <form
+        ref={form}
+        className="screen-layout"
+        onSubmit={handleSubmit}
+        noValidate
+      >
         <div className="screen-form">
           <section className="form-section" aria-labelledby="data-title">
             <div className="form-section-header">
@@ -163,25 +228,43 @@ function ScreenPage() {
             </div>
 
             {mode === 'upload' ? (
-              <div key="upload" className="upload-grid">
-                <UploadZone
-                  label="Transactions CSV"
-                  header="transaction_id,account_id,amount,timestamp,merchant"
-                  note="Up to 200,000 rows."
-                  file={transactionsFile}
-                  rows={transactionRows}
-                  error={fieldErrors['upload.transactions']}
-                  onChange={chooseTransactionsFile}
-                />
-                <UploadZone
-                  label="Blacklist CSV"
-                  optional
-                  header="account_id"
-                  note="One column of blacklisted account IDs."
-                  file={blacklistFile}
-                  rows={blacklistRows}
-                  onChange={setBlacklistFile}
-                />
+              <div key="upload" className="upload-section">
+                <div className="upload-grid">
+                  <UploadZone
+                    label="Transactions CSV"
+                    name={TRANSACTIONS_FILE}
+                    columns={TRANSACTION_COLUMNS}
+                    note="Up to 200,000 rows."
+                    file={transactionsFile}
+                    rows={transactionRows}
+                    error={fieldErrors[TRANSACTIONS_FILE]}
+                    onChange={chooseTransactionsFile}
+                  />
+                  <UploadZone
+                    label="Blacklist CSV"
+                    optional
+                    columns={BLACKLIST_COLUMNS}
+                    note="One column of blacklisted account IDs."
+                    file={blacklistFile}
+                    rows={blacklistRows}
+                    onChange={setBlacklistFile}
+                  />
+                </div>
+                <p className="upload-notice">
+                  <Info aria-hidden="true" />
+                  <span>
+                    Use synthetic or anonymised data only, never real customer
+                    data, account numbers or card details. Or use{' '}
+                    <button
+                      type="button"
+                      className="link-button"
+                      onClick={() => setMode('sample')}
+                    >
+                      Generate sample data
+                    </button>
+                    .
+                  </span>
+                </p>
               </div>
             ) : (
               <div key="sample" className="field-grid">
@@ -191,8 +274,8 @@ function ScreenPage() {
                   error={fieldErrors['sample.size']}
                 >
                   <Select
-                    value={sample.size}
-                    onChange={(e) => updateSample('size', e.target.value)}
+                    value={sampleSize}
+                    onChange={(e) => setSampleSize(e.target.value)}
                   >
                     {SAMPLE_SIZES.map((size) => (
                       <option key={size} value={size}>
@@ -206,36 +289,28 @@ function ScreenPage() {
                   hint="The same seed always generates the same data."
                   error={fieldErrors['sample.seed']}
                 >
-                  <Input
-                    inputMode="numeric"
-                    value={sample.seed}
-                    onChange={(e) => updateSample('seed', e.target.value)}
-                  />
+                  <Input inputMode="numeric" {...numberInput('sample.seed')} />
                 </Field>
                 <Field
                   label="Duplicate rate"
+                  valueNote={percentNote('sample.duplicateRate')}
                   hint="Share of rows that repeat an earlier transaction ID, 0 to 0.2."
                   error={fieldErrors['sample.duplicateRate']}
                 >
                   <Input
                     inputMode="decimal"
-                    value={sample.duplicateRate}
-                    onChange={(e) =>
-                      updateSample('duplicateRate', e.target.value)
-                    }
+                    {...numberInput('sample.duplicateRate')}
                   />
                 </Field>
                 <Field
                   label="Blacklist rate"
+                  valueNote={percentNote('sample.blacklistRate')}
                   hint="Share of accounts on the blacklist, 0 to 0.2."
                   error={fieldErrors['sample.blacklistRate']}
                 >
                   <Input
                     inputMode="decimal"
-                    value={sample.blacklistRate}
-                    onChange={(e) =>
-                      updateSample('blacklistRate', e.target.value)
-                    }
+                    {...numberInput('sample.blacklistRate')}
                   />
                 </Field>
               </div>
@@ -261,21 +336,18 @@ function ScreenPage() {
                 <Input
                   inputMode="numeric"
                   placeholder="Row count"
-                  value={config.expectedInsertions}
-                  onChange={(e) =>
-                    updateConfig('expectedInsertions', e.target.value)
-                  }
+                  {...numberInput('config.expectedInsertions')}
                 />
               </Field>
               <Field
                 label="Target false-positive rate"
+                valueNote={percentNote('config.targetFpr')}
                 hint="Between 0 and 1, for example 0.01 for 1 percent."
                 error={fieldErrors['config.targetFpr']}
               >
                 <Input
                   inputMode="decimal"
-                  value={config.targetFpr}
-                  onChange={(e) => updateConfig('targetFpr', e.target.value)}
+                  {...numberInput('config.targetFpr')}
                 />
               </Field>
               <Field
@@ -286,8 +358,7 @@ function ScreenPage() {
                 <Input
                   inputMode="numeric"
                   placeholder="Optimal"
-                  value={config.hashCount}
-                  onChange={(e) => updateConfig('hashCount', e.target.value)}
+                  {...numberInput('config.hashCount')}
                 />
               </Field>
             </SettingsGroup>
@@ -303,10 +374,7 @@ function ScreenPage() {
               >
                 <Input
                   inputMode="numeric"
-                  value={config.bucketSeconds}
-                  onChange={(e) =>
-                    updateConfig('bucketSeconds', e.target.value)
-                  }
+                  {...numberInput('config.bucketSeconds')}
                 />
               </Field>
             </SettingsGroup>
@@ -322,8 +390,7 @@ function ScreenPage() {
               >
                 <Input
                   inputMode="decimal"
-                  value={config.percentile}
-                  onChange={(e) => updateConfig('percentile', e.target.value)}
+                  {...numberInput('config.percentile')}
                 />
               </Field>
             </SettingsGroup>
@@ -337,20 +404,18 @@ function ScreenPage() {
                 hint="Seeds the hash functions and Quickselect, so results repeat."
                 error={fieldErrors['config.seed']}
               >
-                <Input
-                  inputMode="numeric"
-                  value={config.seed}
-                  onChange={(e) => updateConfig('seed', e.target.value)}
-                />
+                <Input inputMode="numeric" {...numberInput('config.seed')} />
               </Field>
             </SettingsGroup>
           </section>
 
           {error && <ErrorAlert error={error} />}
-          {submitting && slow && <Alert tone="info">{SLOW_MESSAGE}</Alert>}
+          {submitting && slow && <WakingNotice />}
 
           <div className="form-footer">
-            <p className="form-footer-note">Runs are kept for 30 minutes.</p>
+            <p className="form-footer-note">
+              Runs are kept for up to 30 minutes.
+            </p>
             <Button type="submit" loading={submitting}>
               {submitting ? screeningLabel : 'Start screening'}
             </Button>
@@ -397,58 +462,22 @@ function SettingsGroup({ title, description, children }: SettingsGroupProps) {
   )
 }
 
-/** Reads the settings, leaving out blank fields so the server uses its defaults. */
-function readConfig(form: ConfigForm, errors: FieldErrors): RunConfigInput {
+/** The settings to send, leaving out blank fields so the server uses its defaults. Call after checkForm. */
+function runConfig(values: Record<FieldKey, string>): RunConfigInput {
   const config: RunConfigInput = {}
-  const set = <K extends keyof RunConfigInput>(
-    key: K,
-    value: RunConfigInput[K] | undefined,
-  ) => {
+  const set = (name: keyof RunConfigInput, key: FieldKey) => {
+    const value = fieldValue(values[key])
     if (value !== undefined) {
-      config[key] = value
+      config[name] = value
     }
   }
-  set(
-    'expectedInsertions',
-    readNumber(
-      form.expectedInsertions,
-      'config.expectedInsertions',
-      errors,
-      true,
-    ),
-  )
-  set('targetFpr', readNumber(form.targetFpr, 'config.targetFpr', errors))
-  set('hashCount', readNumber(form.hashCount, 'config.hashCount', errors, true))
-  set(
-    'bucketSeconds',
-    readNumber(form.bucketSeconds, 'config.bucketSeconds', errors, true),
-  )
-  set('percentile', readNumber(form.percentile, 'config.percentile', errors))
-  set('seed', readNumber(form.seed, 'config.seed', errors, true))
+  set('expectedInsertions', 'config.expectedInsertions')
+  set('targetFpr', 'config.targetFpr')
+  set('hashCount', 'config.hashCount')
+  set('bucketSeconds', 'config.bucketSeconds')
+  set('percentile', 'config.percentile')
+  set('seed', 'config.seed')
   return config
-}
-
-/** Parses a number field. Blank gives undefined; anything else that is not a number records an error. */
-function readNumber(
-  raw: string,
-  key: string,
-  errors: FieldErrors,
-  wholeNumber = false,
-): number | undefined {
-  const text = raw.trim()
-  if (text === '') {
-    return undefined
-  }
-  const value = Number(text)
-  if (!Number.isFinite(value)) {
-    errors[key] = 'Enter a number.'
-    return undefined
-  }
-  if (wholeNumber && !Number.isInteger(value)) {
-    errors[key] = 'Enter a whole number.'
-    return undefined
-  }
-  return value
 }
 
 function positiveInteger(raw: string): number | null {

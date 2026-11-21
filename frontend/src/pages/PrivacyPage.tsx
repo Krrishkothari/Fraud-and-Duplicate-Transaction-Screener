@@ -5,7 +5,7 @@ function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy policy"
-      lastUpdated="18 November 2026"
+      lastUpdated="21 November 2026"
       intro="What happens to the files you give TxnScreen, and how long they are kept."
     >
       <LegalSection title="What we process">
@@ -37,10 +37,11 @@ function PrivacyPage() {
 
       <LegalSection title="Accounts, cookies and tracking">
         <p>
-          There are no accounts and no sign-in. The site sets no cookies, keeps
-          nothing in your browser&apos;s storage, and loads no analytics or
-          tracking scripts. Its fonts are served from the site itself, not from
-          another company.
+          There are no accounts and no sign-in. The only thing the site stores
+          in your browser is your light or dark theme choice, if you pick one in
+          the header, so the next visit opens in the same theme. There are no
+          cookies, no analytics and no tracking. Its fonts are served from the
+          site itself, not from another company.
         </p>
       </LegalSection>
 

@@ -7,6 +7,7 @@ import type { BloomPlan } from '../api/types'
 import { formatBytes, formatInteger, formatPercent } from '../format'
 import Alert from './Alert'
 import { Loading, Skeleton } from './Skeleton'
+import WakingNotice from './WakingNotice'
 
 const DEBOUNCE_MS = 400
 
@@ -37,6 +38,8 @@ interface PlanResult {
 function FilterPlan({ n, p, k }: FilterPlanProps) {
   const key = n !== null && p !== null ? `${n}|${p}|${k}` : null
   const [result, setResult] = useState<PlanResult | null>(null)
+  // The settings whose plan request has run for 3 seconds without an answer.
+  const [slowKey, setSlowKey] = useState<string | null>(null)
 
   useEffect(() => {
     if (key === null || n === null || p === null) {
@@ -44,7 +47,10 @@ function FilterPlan({ n, p, k }: FilterPlanProps) {
     }
     const controller = new AbortController()
     const timer = setTimeout(() => {
-      getBloomPlan(n, p, k, controller.signal).then(
+      getBloomPlan(n, p, k, {
+        signal: controller.signal,
+        onSlow: () => setSlowKey(key),
+      }).then(
         (plan) => setResult({ key, plan }),
         (error: unknown) => {
           if (error instanceof ApiError) {
@@ -79,15 +85,18 @@ function FilterPlan({ n, p, k }: FilterPlanProps) {
               : 'The duplicate filter is sized to the number of valid rows once the file is read. Enter expected insertions to preview its plan.'}
           </p>
         ) : current === null ? (
-          <Loading label="Loading filter plan">
-            <dl className="plan-values">
-              {PLAN_LABELS.map((label) => (
-                <PlanRow key={label} label={label}>
-                  <Skeleton width={64} height={10} />
-                </PlanRow>
-              ))}
-            </dl>
-          </Loading>
+          <>
+            {slowKey === key && <WakingNotice />}
+            <Loading label="Loading filter plan">
+              <dl className="plan-values">
+                {PLAN_LABELS.map((label) => (
+                  <PlanRow key={label} label={label}>
+                    <Skeleton width={64} height={10} />
+                  </PlanRow>
+                ))}
+              </dl>
+            </Loading>
+          </>
         ) : current.error ? (
           <Alert tone="warning">
             {current.error.fieldErrors.length > 0
