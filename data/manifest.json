@@ -1,0 +1,53 @@
+{
+  "seed": 1795581722,
+  "datasets": [
+    {
+      "name": "random_01",
+      "rows": 3500,
+      "duplicate": 93,
+      "blacklisted": 121,
+      "highAmount": 118,
+      "percentile": 96.62
+    },
+    {
+      "name": "random_02",
+      "rows": 3500,
+      "duplicate": 338,
+      "blacklisted": 41,
+      "highAmount": 0,
+      "percentile": 99.0
+    },
+    {
+      "name": "random_03",
+      "rows": 500,
+      "duplicate": 6,
+      "blacklisted": 185,
+      "highAmount": 1,
+      "percentile": 99.8
+    },
+    {
+      "name": "random_04",
+      "rows": 500,
+      "duplicate": 40,
+      "blacklisted": 141,
+      "highAmount": 15,
+      "percentile": 97.0
+    },
+    {
+      "name": "random_05",
+      "rows": 3500,
+      "duplicate": 0,
+      "blacklisted": 0,
+      "highAmount": 0,
+      "percentile": 99.0
+    },
+    {
+      "name": "random_06",
+      "rows": 800,
+      "duplicate": 136,
+      "blacklisted": 155,
+      "highAmount": 42,
+      "percentile": 94.75
+    }
+  ]
+}
