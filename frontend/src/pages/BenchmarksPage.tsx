@@ -7,7 +7,6 @@ import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
 import ComparisonChart from '../components/benchmarks/ComparisonChart'
 import type { ChartSeries } from '../components/benchmarks/ComparisonChart'
-import EnvironmentStrip from '../components/benchmarks/EnvironmentStrip'
 import MetricTable from '../components/benchmarks/MetricTable'
 import type { MetricGroup } from '../components/benchmarks/MetricTable'
 import { formatInteger, formatMeasured, formatPercent } from '../format'
@@ -58,11 +57,6 @@ function Results({ results }: { results: BenchmarkResults }) {
 
   return (
     <>
-      <EnvironmentStrip
-        environment={results.environment}
-        settings={results.settings}
-      />
-
       <nav className="bench-nav" aria-label="Benchmarks on this page">
         {SECTIONS.map((section) => (
           <a key={section.id} href={`#${section.id}`}>
