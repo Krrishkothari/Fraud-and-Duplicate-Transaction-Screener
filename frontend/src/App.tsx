@@ -2,7 +2,6 @@ import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout.tsx'
 import BenchmarksPage from './pages/BenchmarksPage.tsx'
 import HomePage from './pages/HomePage.tsx'
-import MethodPage from './pages/MethodPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import PrivacyPage from './pages/PrivacyPage.tsx'
 import RunPage from './pages/RunPage.tsx'
@@ -17,7 +16,6 @@ function App() {
         <Route path="/screen" element={<ScreenPage />} />
         <Route path="/runs/:id" element={<RunPage />} />
         <Route path="/benchmarks" element={<BenchmarksPage />} />
-        <Route path="/method" element={<MethodPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="*" element={<NotFoundPage />} />

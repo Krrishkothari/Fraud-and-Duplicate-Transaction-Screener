@@ -2,7 +2,6 @@ import { ChartNoAxesColumn } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { benchmarkResults, medians } from '../benchmarks/results'
 import type { BenchmarkResults } from '../benchmarks/results'
-import { ButtonLink } from '../components/Button'
 import Card from '../components/Card'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
@@ -40,11 +39,6 @@ function BenchmarksPage() {
           <EmptyState
             icon={ChartNoAxesColumn}
             title="No benchmark results yet"
-            action={
-              <ButtonLink to="/method" variant="secondary">
-                Read how each algorithm works
-              </ButtonLink>
-            }
           >
             Run the benchmark runner to create docs/benchmarks/results.json,
             then rebuild the site.

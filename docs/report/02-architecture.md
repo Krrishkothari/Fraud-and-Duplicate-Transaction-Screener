@@ -12,7 +12,7 @@ gets back, apart from the Benchmarks page, which reads the committed `docs/bench
 ```mermaid
 flowchart TB
     subgraph Client["Browser"]
-        UI["React app<br/>pages: Home, Screen, Run, Benchmarks, Method"]
+        UI["React app<br/>pages: Home, Screen, Run, Benchmarks"]
     end
 
     subgraph Vercel["Vercel"]

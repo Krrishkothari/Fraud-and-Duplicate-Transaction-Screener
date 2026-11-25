@@ -1,7 +1,5 @@
-import { ArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { ApiError, getBloomPlan } from '../api/client'
 import type { BloomPlan } from '../api/types'
 import { formatBytes, formatInteger, formatPercent } from '../format'
@@ -109,10 +107,6 @@ function FilterPlan({ n, p, k }: FilterPlanProps) {
       </div>
       <footer className="plan-footer">
         <code className="plan-formula">m = ceil(-n * ln(p) / (ln 2)^2)</code>
-        <Link className="text-link" to="/method#bloom-filter">
-          How the filter is sized
-          <ArrowRight aria-hidden="true" />
-        </Link>
       </footer>
     </section>
   )

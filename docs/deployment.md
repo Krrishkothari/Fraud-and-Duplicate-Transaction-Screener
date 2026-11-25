@@ -62,7 +62,7 @@ curl http://localhost:8080/api/health
 ## Frontend on Vercel
 
 The React app is built to static files and served by Vercel. `frontend/vercel.json` sets the build and
-sends every path to `index.html`, so a direct link or a refresh on a page such as `/method` loads the app
+sends every path to `index.html`, so a direct link or a refresh on a page such as `/benchmarks` loads the app
 instead of a Vercel 404. Unknown paths show the app's own 404 page.
 
 ### Create the project
@@ -93,5 +93,5 @@ Vite builds `VITE_API_BASE_URL` into the site, so redeploy the frontend after ch
 
 ### Check it
 
-Open the site, go to a page such as `/method` and refresh: it loads without a 404. Upload
+Open the site, go to a page such as `/benchmarks` and refresh: it loads without a 404. Upload
 `data/samples/transactions_1000.csv` on the Screen page: the results load, which shows the API and `ALLOWED_ORIGINS` are set up.

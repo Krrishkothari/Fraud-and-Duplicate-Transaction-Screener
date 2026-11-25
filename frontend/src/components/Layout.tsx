@@ -15,7 +15,6 @@ import ThemeToggle from './ThemeToggle'
 const NAV_ITEMS = [
   { to: '/screen', label: 'Screen' },
   { to: '/benchmarks', label: 'Benchmarks' },
-  { to: '/method', label: 'Method' },
 ]
 
 /** The screening form. The header's Start screening button is hidden there, since it would link to itself. */
@@ -136,9 +135,6 @@ function Layout() {
             </p>
             <nav aria-label="Footer">
               <ul className="site-footer-links">
-                <li>
-                  <Link to="/method">Method</Link>
-                </li>
                 <li>
                   <Link to="/benchmarks">Benchmarks</Link>
                 </li>

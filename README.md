@@ -40,8 +40,7 @@ Technology.
 | Segment tree over time buckets | Sum, count and maximum for any time window, and point updates for live transactions | O(log B) per query or update, for B buckets |
 | Randomized Quickselect with three-way partition | The percentile amount that sets the `HIGH_AMOUNT` threshold, for the whole run or one window | Expected O(n) |
 
-Each one has a section in the technical report under [docs/report/](docs/report/), and the app's Method page
-explains them in plain language.
+Each one has a section in the technical report under [docs/report/](docs/report/).
 
 ## Screenshots
 

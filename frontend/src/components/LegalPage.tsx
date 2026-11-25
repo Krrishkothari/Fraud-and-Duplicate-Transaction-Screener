@@ -21,10 +21,10 @@ export function LegalPage({
   useDocumentTitle(title)
   return (
     <article className="container legal">
-      <header className="docs-header">
+      <header className="legal-header">
         <h1>{title}</h1>
         <p className="legal-updated">Last updated {lastUpdated}</p>
-        <p className="docs-lede">{intro}</p>
+        <p className="legal-lede">{intro}</p>
       </header>
       {children}
     </article>

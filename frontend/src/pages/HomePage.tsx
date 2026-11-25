@@ -1,5 +1,4 @@
 import { ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { benchmarkResults } from '../benchmarks/results'
 import { ButtonLink } from '../components/Button'
 import CsvHeader from '../components/CsvHeader'
@@ -28,21 +27,18 @@ const ALGORITHMS = [
     name: 'Bloom filter',
     pkg: 'com.txnscreen.algo.bloom',
     cost: 'O(k) per lookup',
-    anchor: 'bloom-filter',
     text: 'Checks each account against the blacklist and each transaction ID against the IDs already seen. Every possible match is confirmed against an exact set before a flag is raised.',
   },
   {
     name: 'Segment tree',
     pkg: 'com.txnscreen.algo.segtree',
     cost: 'O(log B) per window',
-    anchor: 'segment-tree',
     text: 'Answers the total, count and largest amount for any time window, and takes new transactions as point updates.',
   },
   {
     name: 'Randomized Quickselect',
     pkg: 'com.txnscreen.algo.select',
     cost: 'O(n) expected',
-    anchor: 'quickselect',
     text: 'Finds the amount percentile used as the high amount threshold without sorting the amounts.',
   },
 ]
@@ -119,14 +115,6 @@ function HomePage() {
               <h3 className="feature-title">{algorithm.name}</h3>
               <p className="feature-text">{algorithm.text}</p>
               <p className="feature-cost mono">{algorithm.cost}</p>
-              <Link
-                className="text-link"
-                to={`/method#${algorithm.anchor}`}
-                aria-label={`Read the method for the ${algorithm.name}`}
-              >
-                Read the method
-                <ArrowRight aria-hidden="true" />
-              </Link>
             </li>
           ))}
         </ul>
