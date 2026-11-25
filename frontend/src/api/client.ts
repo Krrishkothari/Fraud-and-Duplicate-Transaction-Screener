@@ -11,6 +11,7 @@ import type {
   RunConfigInput,
   RunSummary,
   SampleRunRequest,
+  ScreenedTransaction,
   SeriesResponse,
   ThresholdResponse,
   WindowResult,
@@ -223,6 +224,24 @@ export function getFlags(
   }
   return request<PageResponse<FlaggedTransaction>>(
     `/api/runs/${encodeURIComponent(id)}/flags?${params}`,
+    {},
+    { signal },
+  )
+}
+
+/** GET /api/runs/{id}/transactions: one page of every valid transaction in screening order, with its flags. */
+export function getTransactions(
+  id: string,
+  page: number,
+  size: number,
+  signal?: AbortSignal,
+): Promise<PageResponse<ScreenedTransaction>> {
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  })
+  return request<PageResponse<ScreenedTransaction>>(
+    `/api/runs/${encodeURIComponent(id)}/transactions?${params}`,
     {},
     { signal },
   )

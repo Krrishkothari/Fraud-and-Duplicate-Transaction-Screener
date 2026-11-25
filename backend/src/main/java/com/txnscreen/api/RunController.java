@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -107,6 +108,22 @@ public class RunController {
     }
 
     /**
+     * Returns one page of every valid transaction in screening order, each with the flags raised on it.
+     */
+    @GetMapping("/{id}/transactions")
+    public PageResponse<ScreenedTransaction> getTransactions(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        requirePage(page, size);
+        Run run = runService.getRun(id);
+        // Transactions are read before flags, so every flag of a listed transaction that has finished its
+        // live append is included.
+        PageResponse<Transaction> transactionPage = PageResponse.of(List.copyOf(run.transactions()), page, size);
+        return transactionPage.withItems(withFlags(transactionPage.items(), run.screening().flags()));
+    }
+
+    /**
      * Returns one page of rejected rows in file order.
      */
     @GetMapping("/{id}/rejected")
@@ -130,6 +147,22 @@ public class RunController {
             }
         }
         return flags.stream().map(flag -> FlaggedTransaction.of(flag, byLine.get(flag.lineNumber()))).toList();
+    }
+
+    private static List<ScreenedTransaction> withFlags(List<Transaction> transactions, List<Flag> flags) {
+        Map<Integer, List<ScreenedTransaction.FlagNote>> byLine = new HashMap<>();
+        for (Transaction transaction : transactions) {
+            byLine.put(transaction.lineNumber(), new ArrayList<>());
+        }
+        for (Flag flag : flags) {
+            List<ScreenedTransaction.FlagNote> notes = byLine.get(flag.lineNumber());
+            if (notes != null) {
+                notes.add(new ScreenedTransaction.FlagNote(flag.type(), flag.detail()));
+            }
+        }
+        return transactions.stream()
+                .map(transaction -> ScreenedTransaction.of(transaction, byLine.get(transaction.lineNumber())))
+                .toList();
     }
 
     private static ResponseEntity<RunSummary> created(Run run) {

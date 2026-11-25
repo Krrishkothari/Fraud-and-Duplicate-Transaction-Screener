@@ -1,11 +1,12 @@
 import { Download, SearchX, ShieldCheck } from 'lucide-react'
 import { useCallback, useState } from 'react'
-import { ApiError, asApiError, getFlags } from '../../api/client'
-import type { FlaggedTransaction, FlagType } from '../../api/types'
+import { ApiError, asApiError } from '../../api/client'
+import type { FlagType, ScreenedTransaction } from '../../api/types'
 import { formatEpochSeconds, formatInteger, formatRupees } from '../../format'
 import { useRun } from '../../run/RunContext'
-import { downloadText, flagsAsCsv } from '../../run/exportFlags'
+import { downloadText, rowsAsCsv } from '../../run/exportRows'
 import { FLAG_LABELS, FLAG_TONES, FLAG_TYPES } from '../../run/flagTypes'
+import { getScreenedRows } from '../../run/screenedRows'
 import { usePage } from '../../run/usePage'
 import { ErrorAlert } from '../Alert'
 import Badge from '../Badge'
@@ -26,8 +27,8 @@ type Filter = 'ALL' | FlagType
 
 const EMPTY_STATES: Record<Filter, { title: string; body: string }> = {
   ALL: {
-    title: 'No flagged transactions',
-    body: 'No transaction was blacklisted, duplicated or above the high amount threshold.',
+    title: 'No transactions',
+    body: 'This run has no valid transactions.',
   },
   BLACKLISTED: {
     title: 'No blacklisted transactions',
@@ -50,7 +51,7 @@ interface Sort {
   direction: SortDirection
 }
 
-const SORT_VALUES: Record<SortKey, (item: FlaggedTransaction) => number> = {
+const SORT_VALUES: Record<SortKey, (item: ScreenedTransaction) => number> = {
   line: (item) => item.lineNumber,
   amount: (item) => item.amountPaise,
   time: (item) => item.epochSeconds,
@@ -62,10 +63,10 @@ type ExportState =
   | { status: 'failed'; error: ApiError }
 
 /**
- * Flagged transactions, filtered by flag type and paged by the server. Search and sorting rearrange the page
- * in view; the export fetches every page of the current filter.
+ * Every valid transaction with its flags, or the flags of one type, paged by the server. Search and sorting
+ * rearrange the page in view; the export fetches every page of the current filter.
  */
-function FlaggedTable() {
+function TransactionTable() {
   const { run } = useRun()
   const [filter, setFilter] = useState<Filter>('ALL')
   const [page, setPage] = useState(0)
@@ -79,18 +80,15 @@ function FlaggedTable() {
 
   // Depends on the whole summary, not just its ID, so a refresh after a live transaction reloads the page.
   const load = useCallback(
-    (signal: AbortSignal) => getFlags(run.id, type, page, PAGE_SIZE, signal),
+    (signal: AbortSignal) =>
+      getScreenedRows(run.id, type, page, PAGE_SIZE, signal),
     [run, type, page],
   )
   const { page: result, error } = usePage(`${filter}|${page}|${attempt}`, load)
 
-  const allCount = FLAG_TYPES.reduce(
-    (sum, flagType) => sum + run.flagCounts[flagType],
-    0,
-  )
-  const filterCount = type === null ? allCount : run.flagCounts[type]
+  const filterCount = type === null ? run.validRows : run.flagCounts[type]
   const options: SegmentedOption<Filter>[] = [
-    { value: 'ALL', label: 'All', count: formatInteger(allCount) },
+    { value: 'ALL', label: 'All', count: formatInteger(run.validRows) },
     ...FLAG_TYPES.map((flagType) => ({
       value: flagType,
       label: FLAG_LABELS[flagType],
@@ -118,11 +116,12 @@ function FlaggedTable() {
   async function exportCsv() {
     setExportState({ status: 'running', fetched: 0, total: filterCount })
     try {
-      const csv = await flagsAsCsv(run.id, type, (fetched, total) =>
+      const csv = await rowsAsCsv(run.id, type, (fetched, total) =>
         setExportState({ status: 'running', fetched, total }),
       )
-      const suffix = type === null ? '' : `-${type.toLowerCase()}`
-      downloadText(csv, `txnscreen-${run.id}-flags${suffix}.csv`)
+      const name =
+        type === null ? 'transactions' : `flags-${type.toLowerCase()}`
+      downloadText(csv, `txnscreen-${run.id}-${name}.csv`)
       setExportState({ status: 'idle' })
     } catch (caught) {
       setExportState({ status: 'failed', error: asApiError(caught) })
@@ -136,8 +135,8 @@ function FlaggedTable() {
 
   return (
     <Card
-      title="Flagged transactions"
-      description="Every flag in screening order. A transaction with two flags appears once for each."
+      title="Transactions"
+      description="Every valid transaction in screening order with its flags. Pick a flag type to see only those flags."
       flush
       actions={
         <Button
@@ -163,7 +162,7 @@ function FlaggedTable() {
           onChange={changeFilter}
         />
         <SearchInput
-          label="Search the flagged transactions on this page"
+          label="Search the transactions on this page"
           placeholder="Search this page"
           value={query}
           onChange={setQuery}
@@ -182,7 +181,7 @@ function FlaggedTable() {
           />
         </div>
       ) : result === null ? (
-        <TableSkeleton label="Loading flagged transactions" columns={7} />
+        <TableSkeleton label="Loading transactions" columns={7} />
       ) : result.totalItems === 0 ? (
         <EmptyState icon={ShieldCheck} title={EMPTY_STATES[filter].title}>
           {EMPTY_STATES[filter].body}
@@ -207,7 +206,7 @@ function FlaggedTable() {
               this page matches &ldquo;{query}&rdquo;.
             </EmptyState>
           ) : (
-            <Table label="Flagged transactions" scroll>
+            <Table label="Transactions" scroll>
               <thead>
                 <tr>
                   <SortHeader
@@ -230,13 +229,13 @@ function FlaggedTable() {
                     onSort={() => toggleSort('time')}
                   />
                   <th scope="col">Merchant</th>
-                  <th scope="col">Flag</th>
+                  <th scope="col">Flags</th>
                   <th scope="col">Detail</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((item) => (
-                  <tr key={`${item.lineNumber}-${item.type}`}>
+                  <tr key={item.lineNumber}>
                     <td className="num mono">{item.lineNumber}</td>
                     <td className="mono">{item.transactionId}</td>
                     <td className="mono">{item.accountId}</td>
@@ -247,24 +246,47 @@ function FlaggedTable() {
                       {formatEpochSeconds(item.epochSeconds)}
                     </td>
                     <td>{item.merchant}</td>
-                    <td>
-                      <Badge tone={FLAG_TONES[item.type]} dot>
-                        {FLAG_LABELS[item.type]}
-                      </Badge>
-                    </td>
-                    <td className="cell-muted">{item.detail}</td>
+                    {item.flags.length === 0 ? (
+                      <>
+                        <td className="cell-muted">None</td>
+                        <td />
+                      </>
+                    ) : (
+                      <>
+                        <td>
+                          <div className="cell-stack">
+                            {item.flags.map((flag) => (
+                              <Badge
+                                key={flag.type}
+                                tone={FLAG_TONES[flag.type]}
+                                dot
+                              >
+                                {FLAG_LABELS[flag.type]}
+                              </Badge>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="cell-muted">
+                          <div className="cell-stack">
+                            {item.flags.map((flag) => (
+                              <span key={flag.type}>{flag.detail}</span>
+                            ))}
+                          </div>
+                        </td>
+                      </>
+                    )}
                   </tr>
                 ))}
               </tbody>
             </Table>
           )}
           <Pagination
-            label="Flagged transaction pages"
+            label="Transaction pages"
             page={result.page}
             pageSize={result.size}
             totalItems={result.totalItems}
             totalPages={result.totalPages}
-            noun="flags"
+            noun={type === null ? 'transactions' : 'flags'}
             onChange={setPage}
           />
         </>
@@ -275,10 +297,10 @@ function FlaggedTable() {
 
 /** The page's rows that match the search, in the chosen order, or in screening order when there is none. */
 function arrange(
-  items: FlaggedTransaction[],
+  items: ScreenedTransaction[],
   query: string,
   sort: Sort | null,
-): FlaggedTransaction[] {
+): ScreenedTransaction[] {
   const needle = query.trim().toLowerCase()
   const matching =
     needle === ''
@@ -288,8 +310,10 @@ function arrange(
             item.transactionId,
             item.accountId,
             item.merchant,
-            item.detail,
-            FLAG_LABELS[item.type],
+            ...item.flags.flatMap((flag) => [
+              flag.detail,
+              FLAG_LABELS[flag.type],
+            ]),
           ].some((text) => text.toLowerCase().includes(needle)),
         )
   if (sort === null) {
@@ -300,4 +324,4 @@ function arrange(
   return matching.toSorted((a, b) => sign * (value(a) - value(b)))
 }
 
-export default FlaggedTable
+export default TransactionTable

@@ -157,6 +157,7 @@ response examples are in [docs/api.md](../api.md).
 | POST | `/api/runs/sample` | Generate seeded synthetic data on the server and screen it | all three | 201 |
 | GET | `/api/runs/{id}` | Run summary: counts, Bloom stats, threshold, data range, warnings | none, stored results | 200 |
 | GET | `/api/runs/{id}/flags?type=&page=&size=` | One page of flagged transactions | none, stored results | 200 |
+| GET | `/api/runs/{id}/transactions?page=&size=` | One page of every valid transaction with its flags | none, stored results | 200 |
 | GET | `/api/runs/{id}/rejected?page=&size=` | One page of rejected rows with line number and reason | none, stored results | 200 |
 | GET | `/api/runs/{id}/window?from=&to=` | Sum, count and maximum for one time window | segment tree query | 200 |
 | GET | `/api/runs/{id}/series?from=&to=&points=` | Up to 500 consecutive windows for the chart | one segment tree query per window | 200 |

@@ -132,7 +132,7 @@ const card = (page, title) =>
   await settle(page)
   await shot(page, '03-run-summary-and-duplicate-flags.png', [
     page.locator('.stat-grid'),
-    card(page, 'Flagged transactions'),
+    card(page, 'Transactions'),
   ])
 
   const bloom = await openTab(page, 'Bloom filters')

@@ -343,6 +343,51 @@ curl -G "$API/api/runs/$RUN/flags" --data-urlencode "type=DUPLICATE" --data-urle
 }
 ```
 
+## GET /api/runs/{id}/transactions
+
+Returns one page of every valid transaction in screening order, each with the flags raised on it. A
+transaction that passed screening has an empty `flags` list. It takes `page` and `size` like `/flags`.
+
+```bash
+curl -G "$API/api/runs/$RUN/transactions" --data-urlencode "page=7" --data-urlencode "size=2"
+```
+
+`200 OK`
+
+```json
+{
+  "items": [
+    {
+      "lineNumber": 16,
+      "transactionId": "TXN00000067",
+      "accountId": "ACC000033",
+      "amountPaise": 72996,
+      "epochSeconds": 1767263715,
+      "merchant": "Restaurant 163",
+      "flags": [
+        {
+          "type": "DUPLICATE",
+          "detail": "Duplicate of line 15"
+        }
+      ]
+    },
+    {
+      "lineNumber": 17,
+      "transactionId": "TXN00000628",
+      "accountId": "ACC000036",
+      "amountPaise": 83463,
+      "epochSeconds": 1767263807,
+      "merchant": "Restaurant 115",
+      "flags": []
+    }
+  ],
+  "page": 7,
+  "size": 2,
+  "totalItems": 1000,
+  "totalPages": 500
+}
+```
+
 ## GET /api/runs/{id}/rejected
 
 Returns one page of rejected rows in file order, with the 1-based line number (the header is line 1), the

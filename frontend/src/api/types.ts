@@ -88,6 +88,17 @@ export interface FlaggedTransaction extends Transaction {
   detail: string
 }
 
+/** One flag on a transaction. */
+export interface FlagNote {
+  type: FlagType
+  detail: string
+}
+
+/** One valid transaction with every flag raised on it, an empty list when it passed screening. */
+export interface ScreenedTransaction extends Transaction {
+  flags: FlagNote[]
+}
+
 export interface RejectedRow {
   lineNumber: number
   reason: RejectReason

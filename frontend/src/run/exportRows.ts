@@ -1,10 +1,10 @@
-import { getFlags } from '../api/client'
-import type { FlaggedTransaction, FlagType } from '../api/types'
+import type { FlagType, ScreenedTransaction } from '../api/types'
 import {
   formatAmountInput,
   formatKolkataInput,
   kolkataInputToIso,
 } from '../format'
+import { getScreenedRows } from './screenedRows'
 
 /** The largest page the server returns, so an export needs as few requests as possible. */
 const EXPORT_PAGE_SIZE = 200
@@ -16,16 +16,17 @@ const COLUMNS = [
   'amount',
   'timestamp',
   'merchant',
-  'flag',
-  'detail',
+  'flags',
+  'details',
 ]
 
 /**
- * Fetches every flag of one type, or of every type when type is null, page by page from the API, and returns
- * them as CSV text in screening order. Amounts are rupees with 2 decimals and timestamps are ISO-8601 with
- * the IST offset, as in an uploaded file. onProgress hears how many flags are fetched out of the total.
+ * Fetches every flag of one type, or every valid transaction when type is null, page by page from the API,
+ * and returns them as CSV text in screening order. A transaction's flag types and details are each joined by
+ * semicolons, and are empty when it has none. Amounts are rupees with 2 decimals and timestamps are ISO-8601
+ * with the IST offset, as in an uploaded file. onProgress hears how many rows are fetched out of the total.
  */
-export async function flagsAsCsv(
+export async function rowsAsCsv(
   runId: string,
   type: FlagType | null,
   onProgress: (fetched: number, total: number) => void,
@@ -34,7 +35,7 @@ export async function flagsAsCsv(
   let page = 0
   let totalPages = 1
   while (page < totalPages) {
-    const result = await getFlags(runId, type, page, EXPORT_PAGE_SIZE)
+    const result = await getScreenedRows(runId, type, page, EXPORT_PAGE_SIZE)
     for (const item of result.items) {
       lines.push(toCsvRow(item))
     }
@@ -45,7 +46,7 @@ export async function flagsAsCsv(
   return `${lines.join('\n')}\n`
 }
 
-function toCsvRow(item: FlaggedTransaction): string {
+function toCsvRow(item: ScreenedTransaction): string {
   return [
     String(item.lineNumber),
     item.transactionId,
@@ -53,8 +54,8 @@ function toCsvRow(item: FlaggedTransaction): string {
     formatAmountInput(item.amountPaise),
     kolkataInputToIso(formatKolkataInput(item.epochSeconds)),
     item.merchant,
-    item.type,
-    item.detail,
+    item.flags.map((flag) => flag.type).join(';'),
+    item.flags.map((flag) => flag.detail).join('; '),
   ]
     .map(csvField)
     .join(',')

@@ -18,8 +18,9 @@ Technology.
 - **Configure the screen.** Set the expected insertions, target false positive rate, hash count, time
   bucket width, percentile and seed. A live filter plan shows the Bloom filter's bits, hash count, memory
   and theoretical false positive rate before the run starts.
-- **Flagged transactions.** Filter by `BLACKLISTED`, `DUPLICATE` or `HIGH_AMOUNT`, page through the
-  results, and see why each was flagged. A duplicate names the line of its first occurrence.
+- **Transactions.** Page through every valid transaction with its flags, or filter by `BLACKLISTED`,
+  `DUPLICATE` or `HIGH_AMOUNT`, and see why each was flagged. A duplicate names the line of its first
+  occurrence.
 - **Rejected rows.** Every invalid row is listed with its line number and reason, and the rest of the file
   is still screened.
 - **Bloom filter statistics.** Bits, hash count, fill ratio, measured and theoretical false positive rate,

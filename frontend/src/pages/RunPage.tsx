@@ -14,7 +14,7 @@ import Tabs from '../components/Tabs'
 import WakingNotice from '../components/WakingNotice'
 import AnalyticsPanel from '../components/run/AnalyticsPanel'
 import BloomStatsPanel from '../components/run/BloomStatsPanel'
-import FlaggedTable from '../components/run/FlaggedTable'
+import TransactionTable from '../components/run/TransactionTable'
 import LiveTransactionPanel from '../components/run/LiveTransactionPanel'
 import RejectedRowsTable from '../components/run/RejectedRowsTable'
 import RunSummary from '../components/run/RunSummary'
@@ -132,8 +132,8 @@ function RunSkeleton({ slow }: { slow: boolean }) {
           ))}
         </div>
       </Loading>
-      <Card title="Flagged transactions" flush>
-        <TableSkeleton label="Loading flagged transactions" columns={7} />
+      <Card title="Transactions" flush>
+        <TableSkeleton label="Loading transactions" columns={7} />
       </Card>
     </div>
   )
@@ -190,7 +190,7 @@ function RunResults({ run, refresh }: RunResultsProps) {
           }
         />
         <RunSummary />
-        <FlaggedTable />
+        <TransactionTable />
         <Tabs
           label="Run details"
           tabs={[

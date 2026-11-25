@@ -122,6 +122,36 @@ class RunControllerTest {
                 .andExpect(jsonPath("$.size").value(50));
     }
 
+    // Proves every valid transaction is listed in screening order, flagged or not, each with its own flags.
+    @Test
+    void transactionsAreListedWithTheirFlags() throws Exception {
+        String transactions = "/api/runs/" + createRun() + "/transactions";
+
+        mockMvc.perform(get(transactions))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(4))
+                .andExpect(jsonPath("$.items[0].lineNumber").value(2))
+                .andExpect(jsonPath("$.items[0].transactionId").value("T1"))
+                .andExpect(jsonPath("$.items[0].amountPaise").value(10_000))
+                .andExpect(jsonPath("$.items[0].flags", hasSize(0)))
+                .andExpect(jsonPath("$.items[1].accountId").value("ACC9"))
+                .andExpect(jsonPath("$.items[1].flags[0].type").value("BLACKLISTED"))
+                .andExpect(jsonPath("$.items[2].lineNumber").value(4))
+                .andExpect(jsonPath("$.items[2].flags", hasSize(1)))
+                .andExpect(jsonPath("$.items[2].flags[0].type").value("DUPLICATE"))
+                .andExpect(jsonPath("$.items[2].flags[0].detail").value("Duplicate of line 2"))
+                .andExpect(jsonPath("$.items[3].lineNumber").value(6))
+                .andExpect(jsonPath("$.items[3].flags", hasSize(0)));
+        mockMvc.perform(get(transactions).param("page", "1").param("size", "3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items", hasSize(1)))
+                .andExpect(jsonPath("$.items[0].transactionId").value("T4"))
+                .andExpect(jsonPath("$.totalPages").value(2));
+        mockMvc.perform(get(transactions).param("size", "0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details.parameter").value("size"));
+    }
+
     // Proves a page past the end is empty, not an error.
     @Test
     void pagePastEndIsEmpty() throws Exception {
